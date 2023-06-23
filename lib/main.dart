@@ -1,7 +1,6 @@
 // // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:mynetwork/screens/Dashboard.dart';
 import 'package:mynetwork/screens/auth.dart';
 // import 'package:mynetwork/screens/auth.dart';
 // import 'package:mynetwork/screens/dashboard.dart';
@@ -13,7 +12,7 @@ import 'package:mynetwork/screens/auth.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: Dash(),
+    home: RouterConnectionPage(),
   ));
 }
 // import 'package:mynetwork/screens/Dashboard.dart';
