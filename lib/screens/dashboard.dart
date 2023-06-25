@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables
+
 import 'package:flutter/material.dart';
 import 'package:mynetwork/screens/dicoveryscreen.dart';
 import 'package:mynetwork/screens/netscreen.dart';
@@ -54,9 +56,13 @@ class _DashState extends State<Dash> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.account_box, color: textPrimaryColor),
+          icon: Icon(
+            Icons.account_box,
+            color: Colors.white,
+            size: 40,
+          ),
           onPressed: () {
             Navigator.push(
               context,
@@ -69,13 +75,14 @@ class _DashState extends State<Dash> {
                       padding: EdgeInsets.zero,
                       children: <Widget>[
                         UserAccountsDrawerHeader(
-                          accountEmail: Text(widget.ipAddress),
-                          accountName: Text(widget.username),
+                          accountEmail: Text('    ' + widget.username),
+                          accountName: Text(widget.ipAddress),
                           currentAccountPicture: CircleAvatar(
-                            backgroundColor: Colors.orange,
+                            backgroundColor: Colors.white,
                             child: Text(
                               "A",
-                              style: TextStyle(fontSize: 40.0),
+                              style: TextStyle(
+                                  fontSize: 40.0, color: Colors.black),
                             ),
                           ),
                           decoration: BoxDecoration(
@@ -148,34 +155,54 @@ class _DashState extends State<Dash> {
             );
           },
         ),
-        title: Center(
-          child: Text(
-            'MyNetwork',
-            style: TextStyle(color: textPrimaryColor),
-          ),
-        ),
+        // title: Center(
+        //   child: Text(
+        //     'MyNetwork',
+        //     style: TextStyle(color: textPrimaryColor),
+        //   ),
+        // ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.message_outlined, color: textPrimaryColor),
-            onPressed: () {
-              print('Notifications');
-            },
-          ),
+          Padding(
+            padding: EdgeInsetsDirectional.only(end: 10),
+            child: IconButton(
+              icon: const Icon(
+                Icons.notifications,
+                color: Colors.white,
+                size: 40,
+              ),
+              onPressed: () {
+                print('Notifications');
+              },
+            ),
+          )
         ],
       ),
       body: screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(
+              Icons.home,
+              color: Colors.white,
+              size: 35,
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.network_cell_rounded),
+            icon: Icon(
+              Icons.network_cell_rounded,
+              color: Colors.white,
+              size: 35,
+            ),
             label: 'Network',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+            icon: Icon(
+              Icons.settings,
+              color: Colors.white,
+              size: 35,
+            ),
             label: 'Settings',
           ),
         ],

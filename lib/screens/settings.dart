@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mynetwork/screens/account.dart';
+import 'package:mynetwork/screens/apppreference.dart';
+import 'package:mynetwork/screens/legal.dart';
 
 class Settings extends StatefulWidget {
   final String ipAddress;
@@ -37,12 +40,12 @@ class _SettingsState extends State<Settings> {
             icon: Icons.settings,
             title: 'App Preferences',
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => AppPreferencesPage(),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PreferencePage(),
+                ),
+              );
             },
           ),
           SizedBox(height: 16.0),
@@ -50,12 +53,12 @@ class _SettingsState extends State<Settings> {
             icon: Icons.account_circle,
             title: 'Account',
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => AccountPage(),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AccountSettingsPage(),
+                ),
+              );
             },
           ),
           SizedBox(height: 16.0),
@@ -63,12 +66,12 @@ class _SettingsState extends State<Settings> {
             icon: Icons.gavel,
             title: 'Legal',
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => LegalPage(),
-              //   ),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LegalPage(),
+                ),
+              );
             },
           ),
           SizedBox(height: 16.0),

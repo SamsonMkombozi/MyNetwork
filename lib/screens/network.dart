@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mynetwork/screens/cdevices.dart';
+import 'package:mynetwork/screens/internet.dart';
+import 'package:mynetwork/screens/router.dart';
 
 class Network extends StatefulWidget {
   final String ipAddress;
@@ -9,7 +12,7 @@ class Network extends StatefulWidget {
     required this.ipAddress,
     required this.username,
     required this.password,
-  });
+  }) : super(key: key);
 
   @override
   State<Network> createState() => _NetworkState();
@@ -36,12 +39,16 @@ class _NetworkState extends State<Network> {
               icon: Icons.signal_cellular_alt,
               title: 'Internet',
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => (),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InternetPage(
+                      ipAddress: widget.ipAddress,
+                      username: widget.username,
+                      password: widget.password,
+                    ),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 8.0),
@@ -49,12 +56,16 @@ class _NetworkState extends State<Network> {
               icon: Icons.router,
               title: 'Network Hardware',
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => NetworkHardwarePage(),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RouterPage(
+                      ipAddress: widget.ipAddress,
+                      username: widget.username,
+                      password: widget.password,
+                    ),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 8.0),
@@ -62,12 +73,16 @@ class _NetworkState extends State<Network> {
               icon: Icons.devices,
               title: 'Connected Devices',
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => ConnectedDevicesPage(),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ConnectedDevicesPage(
+                      ipAddress: widget.ipAddress,
+                      username: widget.username,
+                      password: widget.password,
+                    ),
+                  ),
+                );
               },
             ),
           ],

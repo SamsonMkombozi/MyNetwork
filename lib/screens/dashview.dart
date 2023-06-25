@@ -30,33 +30,40 @@ class Dashview extends StatefulWidget {
 class _DashviewState extends State<Dashview> {
   List<NetworkInfo> networkInfoList = [
     NetworkInfo(
-        title: 'Bandwidth Usage',
-        icon: Icons.network_check,
-        command: '/interface/monitor-traffic'),
+      title: 'Bandwidth Usage',
+      icon: Icons.network_check,
+      command: '/interface/monitor-traffic',
+    ),
     NetworkInfo(
-        title: 'Connected Devices',
-        icon: Icons.devices,
-        command: '/interface/ethernet/print'),
+      title: 'Connected Devices',
+      icon: Icons.devices,
+      command: '/interface/ethernet',
+    ),
     NetworkInfo(
-        title: 'CPU Load',
-        icon: Icons.memory,
-        command: '/system/resource/print'),
+      title: 'CPU Load',
+      icon: Icons.memory,
+      command: '/system/resource',
+    ),
     NetworkInfo(
-        title: 'Uptime',
-        icon: Icons.timelapse,
-        command: '/system/resource/print'),
+      title: 'Uptime',
+      icon: Icons.timelapse,
+      command: '/system/resource',
+    ),
     NetworkInfo(
-        title: 'Download Speed',
-        icon: Icons.arrow_downward,
-        command: '/interface/monitor-traffic'),
+      title: 'Download Speed',
+      icon: Icons.arrow_downward,
+      command: '/interface/monitor-traffic',
+    ),
     NetworkInfo(
-        title: 'Upload Speed',
-        icon: Icons.arrow_upward,
-        command: '/interface/monitor-traffic'),
+      title: 'Upload Speed',
+      icon: Icons.arrow_upward,
+      command: '/interface/monitor-traffic',
+    ),
     NetworkInfo(
-        title: 'Internet Status',
-        icon: Icons.wifi,
-        command: '/interface/monitor-traffic'),
+      title: 'Internet Status',
+      icon: Icons.wifi,
+      command: '/interface/monitor-traffic',
+    ),
   ];
 
   Map<String, String> networkData = {};
@@ -70,17 +77,20 @@ class _DashviewState extends State<Dashview> {
   Future<void> fetchNetworkData() async {
     for (var networkInfo in networkInfoList) {
       String command = networkInfo.command;
-      http.get(
-        Uri.parse('http://${widget.ipAddress}/rest$command'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization':
-              'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
-        },
-      ).then((response) {
+      try {
+        http.Response response = await http.get(
+          Uri.parse('http://${widget.ipAddress}/rest$command'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization':
+                'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+          },
+        );
+
         if (response.statusCode == 200) {
           dynamic responseBody = json.decode(response.body);
           String data = '';
+
           if (networkInfo.title == 'CPU Load') {
             data = responseBody[0]['cpu-load'] ?? 'N/A';
           } else if (networkInfo.title == 'Bandwidth Usage') {
@@ -96,6 +106,7 @@ class _DashviewState extends State<Dashview> {
           } else if (networkInfo.title == 'Connected Devices') {
             data = responseBody.length.toString();
           }
+
           setState(() {
             networkData[networkInfo.title] = data;
           });
@@ -120,7 +131,7 @@ class _DashviewState extends State<Dashview> {
             },
           );
         }
-      }).catchError((error) {
+      } catch (error) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -139,7 +150,7 @@ class _DashviewState extends State<Dashview> {
             );
           },
         );
-      });
+      }
     }
   }
 
@@ -147,6 +158,10 @@ class _DashviewState extends State<Dashview> {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(10),
+        ),
         margin: EdgeInsets.all(16.0),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -155,9 +170,9 @@ class _DashviewState extends State<Dashview> {
             children: [
               Center(
                 child: Text(
-                  'Network Summary',
+                  'MyNetwork',
                   style: TextStyle(
-                    fontSize: 25.0,
+                    fontSize: 40.0,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
@@ -165,25 +180,29 @@ class _DashviewState extends State<Dashview> {
               ),
               SizedBox(height: 16.0),
               for (var networkInfo in networkInfoList)
-                ListTile(
-                  leading: Icon(
-                    networkInfo.icon,
-                    color: Colors.black87,
-                  ),
-                  title: Text(
-                    networkInfo.title,
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontWeight: FontWeight.bold,
+                Center(
+                  child: Center(
+                    child: ListTile(
+                      leading: Icon(
+                        networkInfo.icon,
+                        color: Colors.black87,
+                      ),
+                      title: Text(
+                        networkInfo.title,
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        networkData[networkInfo.title] ?? 'Loading...',
+                        style: TextStyle(
+                          color: Colors.black87,
+                        ),
+                      ),
                     ),
                   ),
-                  subtitle: Text(
-                    networkData[networkInfo.title] ?? 'Loading...',
-                    style: TextStyle(
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
+                )
             ],
           ),
         ),
