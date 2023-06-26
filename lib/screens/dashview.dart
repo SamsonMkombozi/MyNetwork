@@ -3,19 +3,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class NetworkInfo {
-  final String title;
-  final IconData icon;
+  NetworkInfo({required this.title, required this.icon, required this.command});
+
   final String command;
   String? data;
-
-  NetworkInfo({required this.title, required this.icon, required this.command});
+  final IconData icon;
+  final String title;
 }
 
 class Dashview extends StatefulWidget {
-  final String ipAddress;
-  final String username;
-  final String password;
-
   const Dashview({
     Key? key,
     required this.ipAddress,
@@ -23,21 +19,26 @@ class Dashview extends StatefulWidget {
     required this.password,
   }) : super(key: key);
 
+  final String ipAddress;
+  final String password;
+  final String username;
+
   @override
   State<Dashview> createState() => _DashviewState();
 }
 
 class _DashviewState extends State<Dashview> {
+  Map<String, String> networkData = {};
   List<NetworkInfo> networkInfoList = [
     NetworkInfo(
       title: 'Bandwidth Usage',
       icon: Icons.network_check,
-      command: '/interface/monitor-traffic',
+      command: '/interface/ethernet',
     ),
     NetworkInfo(
       title: 'Connected Devices',
       icon: Icons.devices,
-      command: '/interface/ethernet',
+      command: '/interface/wireless/registration-table',
     ),
     NetworkInfo(
       title: 'CPU Load',
@@ -52,21 +53,19 @@ class _DashviewState extends State<Dashview> {
     NetworkInfo(
       title: 'Download Speed',
       icon: Icons.arrow_downward,
-      command: '/interface/monitor-traffic',
+      command: '/interface/ethernet',
     ),
     NetworkInfo(
       title: 'Upload Speed',
       icon: Icons.arrow_upward,
-      command: '/interface/monitor-traffic',
+      command: '/interface/ethernet',
     ),
-    NetworkInfo(
-      title: 'Internet Status',
-      icon: Icons.wifi,
-      command: '/interface/monitor-traffic',
-    ),
+    // NetworkInfo(
+    //   title: 'Internet Status',
+    //   icon: Icons.wifi,
+    //   command: '/interface/monitor-traffic',
+    // ),
   ];
-
-  Map<String, String> networkData = {};
 
   @override
   void initState() {
@@ -91,20 +90,39 @@ class _DashviewState extends State<Dashview> {
           dynamic responseBody = json.decode(response.body);
           String data = '';
 
+          // if (networkInfo.title == 'Connected Devices') {
+          //   data = responseBody.length.toString();
+          // } else if (networkInfo.title == 'CPU Load') {
+          //   data = responseBody.length.toString();
+          // } else if (networkInfo.title == 'Uptime') {
+          //   data = responseBody.length.toString();
+          // }
+
           if (networkInfo.title == 'CPU Load') {
-            data = responseBody[0]['cpu-load'] ?? 'N/A';
-          } else if (networkInfo.title == 'Bandwidth Usage') {
-            data = responseBody[0]['Bandwidth-Usage'] ?? 'N/A';
+            if (responseBody != null && responseBody.length > 0) {
+              data = responseBody['cpu-load'] ?? 'N/A';
+            }
           } else if (networkInfo.title == 'Uptime') {
-            data = responseBody[0]['uptime'] ?? 'N/A';
-          } else if (networkInfo.title == 'Download Speed') {
-            data = responseBody[0]['Download-Speed'] ?? 'N/A';
-          } else if (networkInfo.title == 'Upload Speed') {
-            data = responseBody[0]['Upload-Speed'] ?? 'N/A';
-          } else if (networkInfo.title == 'Internet Status') {
-            data = responseBody[0]['Internet-Status'] ?? 'N/A';
+            if (responseBody != null && responseBody.length > 0) {
+              data = responseBody['uptime'];
+            }
           } else if (networkInfo.title == 'Connected Devices') {
-            data = responseBody.length.toString();
+            if (responseBody != null && responseBody.length > 0) {
+              data = responseBody.length;
+              ;
+            }
+          } else if (networkInfo.title == 'Bandwidth Usage') {
+            if (responseBody != null && responseBody.length > 0) {
+              data = responseBody[0]['bandwidth'];
+            }
+          } else if (networkInfo.title == 'Download Speed') {
+            if (responseBody != null && responseBody.length > 0) {
+              data = responseBody[0]['rx-bytes'];
+            }
+          } else if (networkInfo.title == 'Upload Speed') {
+            if (responseBody != null && responseBody.length > 0) {
+              data = responseBody[0]['tx-bytes'];
+            }
           }
 
           setState(() {

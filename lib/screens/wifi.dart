@@ -24,33 +24,31 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
   String wifiPassword = '';
   bool isPasswordVisible = false;
 
+  @override
+  void initState() {
+    super.initState();
+    fetchWifiDetails();
+  }
+
   Future<void> fetchWifiDetails() async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-            'http://${widget.ipAddress}/rest/interface/wireless/registration-table'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization':
-              'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
-        },
-      );
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        setState(() {
-          wifiUsername = jsonResponse['username'];
-          wifiPassword = jsonResponse['password'];
-        });
-      } else {
-        setState(() {
-          wifiUsername = 'Error retrieving WiFi details';
-          wifiPassword = '';
-        });
-      }
-    } catch (e) {
-      print('Error: $e');
-      final snackBar = SnackBar(content: Text('Error: $e'));
+    final response = await http.get(
+      Uri.parse('http://${widget.ipAddress}/rest/interface/wireless'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        wifiUsername = data['ssid'];
+      });
+    } else {
+      final snackBar = SnackBar(
+          content: Text('Error: ${response.statusCode}  ${response.body}'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      print('failed');
     }
   }
 
@@ -64,15 +62,9 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    fetchWifiDetails();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(),
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
@@ -127,7 +119,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                         ),
                         const SizedBox(height: 40),
                         Text(
-                          'Username\n$wifiUsername',
+                          'Username\n $wifiUsername',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Poppins',
@@ -176,10 +168,8 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                             ),
                             IconButton(
                               onPressed: () {},
-                              icon: FaIcon(
-                                FontAwesomeIcons.shareFromSquare,
-                                size: 60,
-                              ),
+                              icon: FaIcon(FontAwesomeIcons.shareFromSquare,
+                                  size: 60),
                             ),
                           ],
                         ),

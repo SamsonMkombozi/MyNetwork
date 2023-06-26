@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -45,8 +47,8 @@ class _RouterPageState extends State<RouterPage> {
       setState(() {
         routerName = data['architecture-name'];
         routerOsVersion = data['version'];
-        // uploadSpeed = data['upload_speed'];
-        // downloadSpeed = data['download_speed'];
+        // uploadSpeed = data['upload-speed'];
+        // downloadSpeed = data['download-speed'];
       });
     } else {
       print('failed');
@@ -55,15 +57,49 @@ class _RouterPageState extends State<RouterPage> {
 
   Future<void> upgradeRouterOs() async {
     // Make HTTP request to upgrade router OS
-    // Replace <API_ENDPOINT> with your Mikrotik API endpoint
-    await http.post(Uri.parse('<API_ENDPOINT>/upgrade_router_os'));
+    final response = await http.get(
+      Uri.parse('http://${widget.ipAddress}/rest/interface/ethernet'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        downloadSpeed = data[0]['rx-byte'];
+        uploadSpeed = data[0]['tx-byte'];
+        // uploadSpeed = data['upload-speed'];
+        // downloadSpeed = data['download-speed'];
+      });
+    } else {
+      print('failed');
+    }
+
     // Add any additional logic or error handling here
   }
 
   Future<void> rebootRouter() async {
     // Make HTTP request to reboot router
     // Replace <API_ENDPOINT> with your Mikrotik API endpoint
-    await http.post(Uri.parse('<API_ENDPOINT>/reboot_router'));
+    final response = await http.post(
+      Uri.parse('http://${widget.ipAddress}/rest/system/reboot'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Reboot request successful');
+    } else {
+      print('Failed to send reboot request');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
     // Add any additional logic or error handling here
   }
 
@@ -79,29 +115,79 @@ class _RouterPageState extends State<RouterPage> {
           height: 300.0,
           decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(),
+            border: Border.all(
+              color: Colors.black,
+            ),
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Router Name \n $routerName'),
-              Text('RouterOS Version: $routerOsVersion'),
-              Text('Upload Speed: $uploadSpeed'),
-              Text('Download Speed: $downloadSpeed'),
+              Text(
+                'Mikrotik Router "$routerName"',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                'RouterOS Version $routerOsVersion',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 23,
+              ),
+              SizedBox(
+                child: Row(children: [
+                  const SizedBox(
+                    width: 30,
+                  ),
+                  Text('Upload Speed\n $uploadSpeed'),
+                  const SizedBox(
+                    width: 40,
+                  ),
+                  Text('Download Speed\n $downloadSpeed'),
+                ]),
+              ),
+              const SizedBox(
+                height: 63,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.upgrade),
+                    icon: Icon(
+                      Icons.upgrade,
+                      size: 73,
+                      weight: 600,
+                    ),
                     onPressed: upgradeRouterOs,
                   ),
+                  SizedBox(
+                    width: 60,
+                  ),
                   IconButton(
-                    icon: Icon(Icons.restart_alt),
+                    icon: Icon(
+                      Icons.restart_alt,
+                      size: 73,
+                      weight: 600,
+                    ),
                     onPressed: rebootRouter,
+                  ),
+                  SizedBox(
+                    width: 50,
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20,
+              )
             ],
           ),
         ),

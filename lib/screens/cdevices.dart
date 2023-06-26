@@ -12,12 +12,15 @@ class ConnectedDevicesPage extends StatefulWidget {
     required this.username,
     required this.password,
   }) : super(key: key);
+
   @override
   _ConnectedDevicesPageState createState() => _ConnectedDevicesPageState();
 }
 
 class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
   List<DeviceInfo> devices = [];
+
+  String cdevices = '';
 
   @override
   void initState() {
@@ -26,35 +29,47 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
   }
 
   Future<void> fetchConnectedDevices() async {
-    final response =
-        await http.get(Uri.parse('YOUR_API_ENDPOINT_FOR_FETCHING_DEVICES'));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        devices = List<DeviceInfo>.from(
-          data.map((deviceJson) => DeviceInfo.fromJson(deviceJson)),
-        );
-      });
-    } else {
-      // Handle error
-    }
-  }
-
-  Future<void> toggleDeviceBlockStatus(DeviceInfo device) async {
-    final response = await http.post(
-      Uri.parse('YOUR_API_ENDPOINT_FOR_TOGGLING_BLOCK_STATUS'),
-      body: {
-        'deviceId': device.id,
-        'blocked': device.isBlocked ? '0' : '1',
+    final response = await http.get(
+      Uri.parse('http://${widget.ipAddress}/rest/interface'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
       },
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        device.isBlocked = data['blocked'] == '1';
+        devices = List<DeviceInfo>.from(
+            data.map((deviceJson) => DeviceInfo.fromJson(deviceJson)));
       });
     } else {
       // Handle error
+      print('Failed to fetch connected devices');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  }
+
+  Future<void> nodevices() async {
+    final response = await http.get(
+      Uri.parse('http://${widget.ipAddress}/rest/system/resource'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        cdevices = data['connected-Devicese'];
+
+        // uploadSpeed = data['upload-speed'];
+        // downloadSpeed = data['download-speed'];
+      });
+    } else {
+      print('failed');
     }
   }
 
@@ -88,7 +103,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
                     children: [
                       Icon(Icons.devices),
                       SizedBox(width: 10),
-                      Text('\$No Connected Devices'),
+                      Text('${devices.length} Connected Devices'),
                     ],
                   ),
                 ),
@@ -117,7 +132,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
                               ? Icons.block
                               : Icons.check_circle),
                           onPressed: () {
-                            toggleDeviceBlockStatus(device);
+                            // toggleDeviceBlockStatus(device);
                           },
                         ),
                       ),
@@ -152,12 +167,11 @@ class DeviceInfo {
 
   factory DeviceInfo.fromJson(Map<String, dynamic> json) {
     return DeviceInfo(
-      id: json['id'],
-      name: json['name'],
-      macAddress: json['macAddress'],
-      ipAddress: json['ipAddress'],
-      dataUsage: json['dataUsage'],
-      isBlocked: json['isBlocked'],
+      id: json['.id'],
+      name: json['.id'],
+      macAddress: json['mac-address'],
+      ipAddress: json['last-ip'],
+      dataUsage: json['rx-rate'],
     );
   }
 }

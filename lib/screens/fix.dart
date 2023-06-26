@@ -43,6 +43,7 @@ class _TroubleshootingPageState extends State<TroubleshootingPage> {
       appBar: AppBar(
         title: Text('Network Troubleshooting'),
         centerTitle: true,
+        backgroundColor: Colors.black,
       ),
       body: Center(
         child: Column(
