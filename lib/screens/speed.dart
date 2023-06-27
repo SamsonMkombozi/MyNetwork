@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -19,28 +21,41 @@ class SpeedTestPage extends StatefulWidget {
 }
 
 class _SpeedTestPageState extends State<SpeedTestPage> {
-  String speedTestStatus = '';
-
-  Future<void> fetchSpeedTestStatus() async {
-    final response =
-        await http.get(Uri.parse('http://your-router-ip/api/speed-test'));
-
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      setState(() {
-        speedTestStatus = jsonResponse['status'];
-      });
-    } else {
-      setState(() {
-        speedTestStatus = 'Error retrieving speed test status';
-      });
-    }
-  }
+  String downloadspeed = '';
+  String uploadspeed = '';
 
   @override
   void initState() {
     super.initState();
     fetchSpeedTestStatus();
+  }
+
+  Future<void> fetchSpeedTestStatus() async {
+    final response = await http.get(
+      Uri.parse('http://${widget.ipAddress}/rest/interface/ethernet'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      // if (jsonResponse != null && jsonResponse.length > 0) {
+      //   downloadspeed = jsonResponse[0]['rx-bytes'] ?? 'N/A';
+      // } else if (jsonResponse != null && jsonResponse.length > 0) {
+      //   uploadspeed = jsonResponse[0]['tx-bytes'] ?? 'N/A';
+      // }
+      setState(() {
+        downloadspeed = jsonResponse[0]['rx-bytes'] ?? 'N/A';
+        uploadspeed = jsonResponse[0]['tx-bytes'] ?? 'N/A';
+      });
+    } else {
+      final snackBar = SnackBar(
+          content: Text('Error: ${response.statusCode}  ${response.body}'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   @override
@@ -72,7 +87,7 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
               ),
               SizedBox(height: 2),
               Text(
-                'Current Speed:\n$speedTestStatus',
+                'Current Speed:\n$downloadspeed - $uploadspeed',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mynetwork/screens/fix.dart';
 import 'package:mynetwork/screens/wifi.dart';
 
-import 'speed test.dart';
+import 'speed.dart';
 
 class InternetPage extends StatelessWidget {
   final String ipAddress;

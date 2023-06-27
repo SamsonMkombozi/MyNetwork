@@ -40,9 +40,10 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
       },
     );
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = json.decode(response.body);
       setState(() {
-        wifiUsername = data['ssid'];
+        wifiUsername = data[0]['ssid'];
+        wifiPassword = data[0]['radio-name'];
       });
     } else {
       final snackBar = SnackBar(

@@ -28,11 +28,10 @@ class _RouterPageState extends State<RouterPage> {
   void initState() {
     super.initState();
     fetchData();
+    upgradeRouterOs();
   }
 
   Future<void> fetchData() async {
-    // Make HTTP request to retrieve router data
-    // Replace <API_ENDPOINT> with your Mikrotik API endpoint
     final response = await http.get(
       Uri.parse('http://${widget.ipAddress}/rest/system/resource'),
       headers: {
@@ -47,8 +46,6 @@ class _RouterPageState extends State<RouterPage> {
       setState(() {
         routerName = data['architecture-name'];
         routerOsVersion = data['version'];
-        // uploadSpeed = data['upload-speed'];
-        // downloadSpeed = data['download-speed'];
       });
     } else {
       print('failed');
@@ -67,15 +64,15 @@ class _RouterPageState extends State<RouterPage> {
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = json.decode(response.body);
       setState(() {
-        downloadSpeed = data[0]['rx-byte'];
-        uploadSpeed = data[0]['tx-byte'];
-        // uploadSpeed = data['upload-speed'];
-        // downloadSpeed = data['download-speed'];
+        downloadSpeed = data[0]['rx-bytes'] ?? 'N/A';
+        uploadSpeed = data[0]['tx-bytes'] ?? 'N/A';
       });
     } else {
-      print('failed');
+      final snackBar = SnackBar(
+          content: Text('Error: ${response.statusCode}  ${response.body}'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
     // Add any additional logic or error handling here
