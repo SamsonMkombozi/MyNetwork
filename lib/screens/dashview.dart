@@ -90,14 +90,6 @@ class _DashviewState extends State<Dashview> {
           dynamic responseBody = json.decode(response.body);
           String data = '';
 
-          // if (networkInfo.title == 'Connected Devices') {
-          //   data = responseBody.length.toString();
-          // } else if (networkInfo.title == 'CPU Load') {
-          //   data = responseBody.length.toString();
-          // } else if (networkInfo.title == 'Uptime') {
-          //   data = responseBody.length.toString();
-          // }
-
           if (networkInfo.title == 'CPU Load') {
             if (responseBody != null && responseBody.length > 0) {
               data = responseBody['cpu-load'] ?? 'N/A';
@@ -108,8 +100,7 @@ class _DashviewState extends State<Dashview> {
             }
           } else if (networkInfo.title == 'Connected Devices') {
             if (responseBody != null && responseBody.length > 0) {
-              data = responseBody.length;
-              ;
+              data = responseBody.length.toString();
             }
           } else if (networkInfo.title == 'Bandwidth Usage') {
             if (responseBody != null && responseBody.length > 0) {
@@ -133,13 +124,13 @@ class _DashviewState extends State<Dashview> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Data Fetch Failed'),
+                title: const Text('Data Fetch Failed'),
                 content: Text(
                   'Failed to fetch data for ${networkInfo.title}. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
                 ),
                 actions: [
                   TextButton(
-                    child: Text('OK'),
+                    child: const Text('OK'),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -154,12 +145,12 @@ class _DashviewState extends State<Dashview> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Data Fetch Failed'),
+              title: const Text('Data Fetch Failed'),
               content: Text(
                   'An error occurred while fetching data for ${networkInfo.title}: $error'),
               actions: [
                 TextButton(
-                  child: Text('OK'),
+                  child: const Text('OK'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -177,16 +168,16 @@ class _DashviewState extends State<Dashview> {
     return Center(
       child: Card(
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: Colors.black, width: 1),
+          side: const BorderSide(color: Colors.black, width: 1),
           borderRadius: BorderRadius.circular(10),
         ),
-        margin: EdgeInsets.all(16.0),
+        margin: const EdgeInsets.all(16.0),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Center(
+              const Center(
                 child: Text(
                   'MyNetwork',
                   style: TextStyle(
@@ -196,9 +187,9 @@ class _DashviewState extends State<Dashview> {
                   ),
                 ),
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               for (var networkInfo in networkInfoList)
-                Center(
+                Flexible(
                   child: Center(
                     child: ListTile(
                       leading: Icon(
@@ -207,20 +198,30 @@ class _DashviewState extends State<Dashview> {
                       ),
                       title: Text(
                         networkInfo.title,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       subtitle: Text(
                         networkData[networkInfo.title] ?? 'Loading...',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black87,
                         ),
                       ),
                     ),
                   ),
-                )
+                ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    fetchNetworkData();
+                  },
+                  child: Icon(Icons.refresh),
+                  backgroundColor: Colors.black,
+                ),
+              ),
             ],
           ),
         ),

@@ -106,26 +106,14 @@ class _DashState extends State<Dash> {
                         ),
                         ListTile(
                           leading: Icon(Icons.network_cell),
-                          title: Text("Network screen"),
+                          title: Text("Qr generator"),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SettingsPage(),
+                                builder: (context) => QrWidget(),
                               ),
                             );
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.login_outlined),
-                          title: Text("Log in(test)"),
-                          onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => (),
-                            //   ),
-                            // );
                           },
                         ),
                         ListTile(

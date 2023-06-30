@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MyWifiWidget extends StatefulWidget {
   final String ipAddress;
@@ -82,7 +85,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
             style: TextStyle(
               color: Colors.white,
               fontFamily: 'Poppins',
-              fontSize: 22,
+              fontSize: 30,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -97,7 +100,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                 Center(
                   child: Container(
                     width: 350,
-                    height: 400,
+                    height: 450,
                     padding: const EdgeInsets.symmetric(horizontal: 19),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -113,9 +116,9 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 30,
+                            fontSize: 35,
                             fontWeight: FontWeight.w600,
-                            decoration: TextDecoration.underline,
+                            // decoration: TextDecoration.underline,
                           ),
                         ),
                         const SizedBox(height: 40),
@@ -143,17 +146,27 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isPasswordVisible = !isPasswordVisible;
-                                });
-                              },
-                              icon: Icon(
-                                isPasswordVisible
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.black,
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape
+                                    .rectangle, // Set the shape to circle for IconButton with circular border
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2,
+                                ),
+                              ),
+                              child: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    isPasswordVisible = !isPasswordVisible;
+                                  });
+                                },
+                                icon: Icon(
+                                  isPasswordVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ],
@@ -162,15 +175,41 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            IconButton(
-                              onPressed: editWifiDetails,
-                              icon:
-                                  FaIcon(FontAwesomeIcons.solidEdit, size: 60),
+                            SizedBox(
+                              height: 75,
+                              child: ElevatedButton.icon(
+                                onPressed: editWifiDetails,
+                                icon: FaIcon(FontAwesomeIcons.solidEdit,
+                                    size: 60),
+                                label: Text('Edit'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors
+                                      .black, // Set your desired button color here
+                                  onPrimary: Colors
+                                      .white, // Set your desired text/icon color here
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
                             ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: FaIcon(FontAwesomeIcons.shareFromSquare,
-                                  size: 60),
+                            SizedBox(
+                              height: 75,
+                              child: ElevatedButton.icon(
+                                onPressed: _shareQrCode,
+                                icon: FaIcon(FontAwesomeIcons.shareFromSquare,
+                                    size: 60),
+                                label: Text('Share'),
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors
+                                      .black, // Set your desired button color here
+                                  onPrimary: Colors
+                                      .white, // Set your desired text/icon color here
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -185,5 +224,23 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
         ),
       ),
     );
+  }
+
+  void _shareQrCode() async {
+    final qrPainter = QrPainter(
+      data: 'Username\n $wifiUsername\n and \nPassword\n $wifiPassword',
+      version: QrVersions.auto,
+      errorCorrectionLevel: QrErrorCorrectLevel.M,
+      color: Colors.white,
+    );
+
+    final qrCodeImage = await qrPainter.toImageData(300);
+
+    final tempDir = Directory.systemTemp;
+    final filePath = '${tempDir.path}/qr_code.png';
+
+    File(filePath).writeAsBytesSync(qrCodeImage!.buffer.asUint8List());
+
+    Share.shareFiles([filePath], text: 'Sharing wifi QR code');
   }
 }

@@ -30,7 +30,8 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
 
   Future<void> fetchConnectedDevices() async {
     final response = await http.get(
-      Uri.parse('http://${widget.ipAddress}/rest/interface'),
+      Uri.parse(
+          'http://${widget.ipAddress}/rest/interface/wireless/registration-table'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':

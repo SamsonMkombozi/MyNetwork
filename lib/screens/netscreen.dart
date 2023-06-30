@@ -1,441 +1,65 @@
-// // import 'package:flutter/material.dart';
-// // import 'package:http/http.dart' as http;
+// ignore_for_file: unused_import, non_constant_identifier_names, unused_label, unused_field
 
-// // class MikrotikApiExample extends StatefulWidget {
-// //   @override
-// //   _MikrotikApiExampleState createState() => _MikrotikApiExampleState();
-// // }
-
-// // class _MikrotikApiExampleState extends State<MikrotikApiExample> {
-// //   final _ipController = TextEditingController();
-// //   final _responseController = TextEditingController();
-
-// //   Future<void> sendApiRequest(String command) async {
-// //     final ip = _ipController.text;
-// //     final url = Uri.http(ip, '/command');
-
-// //     final response = await http.post(
-// //       url,
-// //       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-// //       body: {'command': command},
-// //     );
-
-// //     if (response.statusCode == 200) {
-// //       setState(() {
-// //         _responseController.text = response.body;
-// //       });
-// //     } else {
-// //       setState(() {
-// //         _responseController.text =
-// //             'Error ${response.statusCode}: ${response.reasonPhrase}';
-// //       });
-// //     }
-// //   }
-
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(
-// //         title: Text('MikroTik API Example'),
-// //       ),
-// //       body: Padding(
-// //         padding: const EdgeInsets.all(16.0),
-// //         child: Column(
-// //           crossAxisAlignment: CrossAxisAlignment.stretch,
-// //           children: [
-// //             TextFormField(
-// //               controller: _ipController,
-// //               decoration: InputDecoration(labelText: 'MikroTik IP'),
-// //             ),
-// //             ElevatedButton(
-// //               onPressed: () {
-// //                 sendApiRequest('/command=system/resource/print');
-// //               },
-// //               child: Text('Get System Info'),
-// //             ),
-// //             ElevatedButton(
-// //               onPressed: () {
-// //                 sendApiRequest('interface print');
-// //               },
-// //               child: Text('Get Interfaces'),
-// //             ),
-// //             ElevatedButton(
-// //               onPressed: () {
-// //                 sendApiRequest('ip firewall filter print');
-// //               },
-// //               child: Text('Get Firewall Filter Rules'),
-// //             ),
-// //             // ... add more buttons for other API commands
-
-// //             SizedBox(height: 16.0),
-// //             TextFormField(
-// //               controller: _responseController,
-// //               maxLines: null,
-// //               readOnly: true,
-// //               decoration: InputDecoration(
-// //                 labelText: 'API Response',
-// //                 border: OutlineInputBorder(),
-// //               ),
-// //             ),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-// // }
-// import 'package:flutter/material.dart';
-
-// void main() {
-//   runApp(NetworkApp());
-// }
-
-// class NetworkApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Network Page',
-//       theme: ThemeData(primarySwatch: Colors.blue),
-//       home: NetworkPage(),
-//     );
-//   }
-// }
-
-// class NetworkPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Network'),
-//       ),
-//       body: Center(
-//         child: Card(
-//           child: Padding(
-//             padding: EdgeInsets.all(16.0),
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 Text(
-//                   'Network Configuration',
-//                   style: TextStyle(
-//                     fontSize: 18.0,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 SizedBox(height: 16.0),
-//                 NetworkOption(
-//                   icon: Icons.signal_cellular_alt,
-//                   title: 'Internet',
-//                   onTap: () {
-//                     Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                         builder: (context) => InternetPage(),
-//                       ),
-//                     );
-//                   },
-//                 ),
-//                 SizedBox(height: 8.0),
-//                 NetworkOption(
-//                   icon: Icons.router,
-//                   title: 'Network Hardware',
-//                   onTap: () {
-//                     Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                         builder: (context) => NetworkHardwarePage(),
-//                       ),
-//                     );
-//                   },
-//                 ),
-//                 SizedBox(height: 8.0),
-//                 NetworkOption(
-//                   icon: Icons.devices,
-//                   title: 'Connected Devices',
-//                   onTap: () {
-//                     Navigator.push(
-//                       context,
-//                       MaterialPageRoute(
-//                         builder: (context) => ConnectedDevicesPage(),
-//                       ),
-//                     );
-//                   },
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class NetworkOption extends StatelessWidget {
-//   final IconData icon;
-//   final String title;
-//   final VoidCallback onTap;
-
-//   const NetworkOption({
-//     required this.icon,
-//     required this.title,
-//     required this.onTap,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListTile(
-//       leading: Icon(icon),
-//       title: Text(
-//         title,
-//         style: TextStyle(
-//           fontSize: 16.0,
-//         ),
-//       ),
-//       onTap: onTap,
-//     );
-//   }
-// }
-
-// class InternetPage extends StatelessWidget {
-//   // You can integrate MikroTik API here to get the speed test status
-//   // and display it dynamically
-//   String getSpeedTestStatus() {
-//     // Your implementation here
-//     return 'In Progress';
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Internet'),
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Text(
-//               'Speed Test Status:',
-//               style: TextStyle(
-//                 fontSize: 18.0,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             SizedBox(height: 8.0),
-//             Text(
-//               getSpeedTestStatus(),
-//               style: TextStyle(
-//                 fontSize: 16.0,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class NetworkHardwarePage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Network Hardware'),
-//       ),
-//       body: Center(
-//         child: Text('Network Hardware Page'),
-//       ),
-//     );
-//   }
-// }
-
-// class ConnectedDevicesPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Connected Devices'),
-//       ),
-//       body: Center(
-//         child: Text('Connected Devices Page'),
-//       ),
-//     );
-//   }
-// }
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/services.dart';
 
-void main() {
-  runApp(SettingsApp());
-}
-
-class SettingsApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Settings Page',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: SettingsPage(),
-    );
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SettingsOption(
-              icon: Icons.settings,
-              title: 'App Preferences',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AppPreferencesPage(),
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 16.0),
-            SettingsOption(
-              icon: Icons.account_circle,
-              title: 'Account',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AccountPage(),
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 16.0),
-            SettingsOption(
-              icon: Icons.gavel,
-              title: 'Legal',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LegalPage(),
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 16.0),
-            SettingsOption(
-              icon: Icons.feedback,
-              title: 'Leave Us Feedback',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FeedbackPage(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SettingsOption extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-
-  const SettingsOption({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  });
+class QrWidget extends StatefulWidget {
+  const QrWidget({super.key});
 
   @override
+  State<QrWidget> createState() => _QrWidgetState();
+}
+
+class _QrWidgetState extends State<QrWidget> {
+  // TextEditingController textdata = TextEditingController();
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Icon(icon),
-              SizedBox(width: 16.0),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16.0,
-                ),
-              ),
-            ],
+    return Container(
+        color: Colors.lime,
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 100),
+            child: QrImageView(
+              embeddedImage: const NetworkImage(''),
+              data: '',
+              version: QrVersions.auto,
+              size: 250.0,
+              backgroundColor: Colors.white,
+            ),
           ),
-        ),
-      ),
-    );
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: TextField(
+          //     // controller: textdata,
+          //     decoration: const InputDecoration(
+          //         border: OutlineInputBorder(), label: Text('Enter Message')),
+          //   ),
+          // ),
+          ElevatedButton(
+            child: const Text(''),
+            onPressed: _shareQrCode,
+          ),
+        ]));
   }
-}
 
-class AppPreferencesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('App Preferences'),
-      ),
-      body: Center(
-        child: Text('App Preferences Page'),
-      ),
+  void _shareQrCode() async {
+    final qrPainter = QrPainter(
+      data: 'share',
+      version: QrVersions.auto,
+      errorCorrectionLevel: QrErrorCorrectLevel.M,
+      color: Colors.white,
     );
-  }
-}
 
-class AccountPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Account'),
-      ),
-      body: Center(
-        child: Text('Account Page'),
-      ),
-    );
-  }
-}
+    final qrCodeImage = await qrPainter.toImageData(300);
 
-class LegalPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Legal'),
-      ),
-      body: Center(
-        child: Text('Legal Page'),
-      ),
-    );
-  }
-}
+    final tempDir = Directory.systemTemp;
+    final filePath = '${tempDir.path}/qr_code.png';
 
-class FeedbackPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Leave Us Feedback'),
-      ),
-      body: Center(
-        child: Text('Feedback Page'),
-      ),
-    );
+    File(filePath).writeAsBytesSync(qrCodeImage!.buffer.asUint8List());
+
+    Share.shareFiles([filePath], text: 'Sharing QR code');
   }
 }
