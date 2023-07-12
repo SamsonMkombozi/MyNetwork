@@ -1,10 +1,13 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:mynetwork/reuseable_widget/notiffication.dart';
 import 'package:mynetwork/screens/dicoveryscreen.dart';
-import 'package:mynetwork/screens/netscreen.dart';
+// import 'package:mynetwork/screens/netscreen.dart';
 import 'package:mynetwork/screens/network.dart';
 import 'package:mynetwork/screens/settings.dart';
+import 'package:mynetwork/test/deviceinfo.dart';
+import 'package:mynetwork/testSql.dart';
 import 'dashview.dart';
 
 class Dash extends StatefulWidget {
@@ -106,12 +109,24 @@ class _DashState extends State<Dash> {
                         ),
                         ListTile(
                           leading: Icon(Icons.network_cell),
-                          title: Text("Qr generator"),
+                          title: Text("DeviceInfo"),
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => QrWidget(),
+                                builder: (context) => deviceInfo(),
+                              ),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.data_object_outlined),
+                          title: Text("Database"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => sql(),
                               ),
                             );
                           },
@@ -159,7 +174,16 @@ class _DashState extends State<Dash> {
                 size: 40,
               ),
               onPressed: () {
-                print('Notifications');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NotificationCenterPage(
+                      ipAddress: widget.ipAddress,
+                      username: widget.username,
+                      password: widget.password,
+                    ),
+                  ),
+                );
               },
             ),
           )

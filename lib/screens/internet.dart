@@ -74,13 +74,13 @@ class InternetPage extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 CircularContainer(
-                  buttonText: 'Fix',
-                  buttonIcon: Icons.build,
+                  buttonText: 'Activty',
+                  buttonIcon: Icons.bar_chart_outlined,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TroubleshootingPage(
+                          builder: (context) => MikrotikChartPage(
                                 ipAddress: ipAddress,
                                 username: username,
                                 password: password,

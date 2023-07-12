@@ -23,6 +23,10 @@ class SpeedTestPage extends StatefulWidget {
 class _SpeedTestPageState extends State<SpeedTestPage> {
   String downloadspeed = '';
   String uploadspeed = '';
+  var d;
+  var dr;
+  var u;
+  var ur;
 
   @override
   void initState() {
@@ -42,20 +46,29 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      // if (jsonResponse != null && jsonResponse.length > 0) {
-      //   downloadspeed = jsonResponse[0]['rx-bytes'] ?? 'N/A';
-      // } else if (jsonResponse != null && jsonResponse.length > 0) {
-      //   uploadspeed = jsonResponse[0]['tx-bytes'] ?? 'N/A';
-      // }
       setState(() {
         downloadspeed = jsonResponse[0]['rx-bytes'] ?? 'N/A';
         uploadspeed = jsonResponse[0]['tx-bytes'] ?? 'N/A';
+        d = int.tryParse(downloadspeed);
+        dr = d ~/ 1000;
+        u = int.tryParse(uploadspeed);
+        ur = u ~/ 1000;
       });
     } else {
       final snackBar = SnackBar(
           content: Text('Error: ${response.statusCode}  ${response.body}'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
+  }
+
+  int parseSpeedString(String speedString) {
+    int speed = 0;
+    try {
+      speed = int.tryParse(speedString) ?? 0;
+    } catch (e) {
+      print('Error parsing speed string: $e');
+    }
+    return speed ~/ 1000000; // Divide by 1000000 to get the speed in Mbps
   }
 
   @override
@@ -87,7 +100,7 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
               ),
               SizedBox(height: 2),
               Text(
-                'Current Speed:\n$downloadspeed - $uploadspeed',
+                'Current Speed:\n$dr Mbps - $ur Mbps',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,

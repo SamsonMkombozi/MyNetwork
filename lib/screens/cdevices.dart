@@ -1,3 +1,4 @@
+// import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,6 +19,22 @@ class ConnectedDevicesPage extends StatefulWidget {
 }
 
 class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
+  // DeviceInfoPlugin deviceInfor = DeviceInfoPlugin();
+  // AndroidDeviceInfo? androidInfo;
+  // WindowsDeviceInfo? windowsInfo;
+
+  // Future<AndroidDeviceInfo> getInfo() async {
+  //   return await deviceInfor.androidInfo;
+  // }
+
+  // Future<IosDeviceInfo> getIosInfo() async {
+  //   return await deviceInfor.iosInfo;
+  // }
+
+  // Future<WindowsDeviceInfo> getWinInfor() async {
+  //   return await deviceInfor.windowsInfo;
+  // }
+
   List<DeviceInfo> devices = [];
 
   String cdevices = '';
@@ -52,25 +69,56 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
     }
   }
 
-  Future<void> nodevices() async {
-    final response = await http.get(
-      Uri.parse('http://${widget.ipAddress}/rest/system/resource'),
+  Future<void> toggleDeviceBlockStatus(DeviceInfo device) async {
+    // Prepare the request body
+    final requestBody = json.encode({
+      'mac-address': device.macAddress,
+      // 'disabled': !device.isBlocked,
+      'authentication': device.isBlocked,
+    });
+
+    final response = await http.post(
+      Uri.parse(
+          'http://${widget.ipAddress}/rest/interface/wireless/access-list/add'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
             'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
       },
+      body: requestBody,
     );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      setState(() {
-        cdevices = data['connected-Devicese'];
 
-        // uploadSpeed = data['upload-speed'];
-        // downloadSpeed = data['download-speed'];
+    if (response.statusCode == 200) {
+      // Update the device's block status
+      setState(() {
+        device.isBlocked = !device.isBlocked;
       });
+      print(
+          'Device ${device.name} ${device.isBlocked ? 'blocked' : 'unblocked'} successfully.');
     } else {
-      print('failed');
+      // Handle error
+      print('Failed to toggle device block status');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Failed to Block device ${device.name} '),
+            content: Text(
+              'Failed to Block Device. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
+            ),
+            actions: [
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -133,7 +181,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
                               ? Icons.block
                               : Icons.check_circle),
                           onPressed: () {
-                            // toggleDeviceBlockStatus(device);
+                            toggleDeviceBlockStatus(device);
                           },
                         ),
                       ),
