@@ -3,9 +3,12 @@
 import 'package:mysql1/mysql1.dart';
 
 class Mysql {
-  static String host = '10.10.100.82';
-  String user = 'bwmgr_testing_remote_user',
-      password = 'fr0zi!a70xuPoPApru?Ukl@iy',
+  // static String host = '10.10.100.82';
+  static String host = 'localhost';
+  // String user = 'bwmgr_testing_remote_user',
+  String user = 'root',
+      // password = 'fr0zi!a70xuPoPApru?Ukl@iy',
+      password = '',
       db = 'etbwmgr';
 
   static int port = 3306;

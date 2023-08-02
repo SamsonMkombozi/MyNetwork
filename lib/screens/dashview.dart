@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -94,7 +92,7 @@ class _DashviewState extends State<Dashview> {
 
           if (networkInfo.title == 'CPU Load') {
             if (responseBody != null && responseBody.length > 0) {
-              data = responseBody['cpu-load'] ?? 'N/A';
+              data = responseBody['cpu-load'] + ' %' ?? 'N/A';
             }
           } else if (networkInfo.title == 'Uptime') {
             if (responseBody != null && responseBody.length > 0) {
@@ -103,6 +101,8 @@ class _DashviewState extends State<Dashview> {
           } else if (networkInfo.title == 'Connected Devices') {
             if (responseBody != null && responseBody.length > 0) {
               data = responseBody.length.toString();
+            } else {
+              data = '0';
             }
           } else if (networkInfo.title == 'Bandwidth Usage') {
             if (responseBody != null && responseBody.length > 0) {
@@ -110,11 +110,17 @@ class _DashviewState extends State<Dashview> {
             }
           } else if (networkInfo.title == 'Download Speed') {
             if (responseBody != null && responseBody.length > 0) {
-              data = responseBody[0]['rx-bytes'] + ' Mbps';
+              // Convert rx-bytes to Mbps
+              int rxBytes = int.tryParse(responseBody[0]['rx-bytes']) ?? 0;
+              double downloadSpeedMbps = rxBytes / 1000000;
+              data = downloadSpeedMbps.toStringAsFixed(2) + ' Mbps';
             }
           } else if (networkInfo.title == 'Upload Speed') {
             if (responseBody != null && responseBody.length > 0) {
-              data = responseBody[0]['tx-bytes'] + ' Mbps';
+              // Convert tx-bytes to Mbps
+              int txBytes = int.tryParse(responseBody[0]['tx-bytes']) ?? 0;
+              double uploadSpeedMbps = txBytes / 1000000;
+              data = uploadSpeedMbps.toStringAsFixed(2) + ' Mbps';
             }
           }
           // else if (networkInfo.title == 'Internet Status') {
@@ -172,10 +178,11 @@ class _DashviewState extends State<Dashview> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      height: 600,
       child: Card(
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Colors.black, width: 2),
+          side: const BorderSide(color: Colors.black, width: 3),
           borderRadius: BorderRadius.circular(10),
         ),
         margin: const EdgeInsets.all(16.0),
@@ -183,6 +190,7 @@ class _DashviewState extends State<Dashview> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               const Text(
                 'MyNetwork',
@@ -193,31 +201,26 @@ class _DashviewState extends State<Dashview> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              // Align(
-              //   child: ,
-              // ),
-              for (var networkInfo in networkInfoList)
-                Flexible(
-                  child: ListTile(
-                    leading: Icon(
-                      networkInfo.icon,
-                      color: Colors.black87,
-                    ),
-                    title: Text(
-                      networkInfo.title,
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Text(
-                      networkData[networkInfo.title] ?? 'Loading...',
-                      style: const TextStyle(
-                        color: Colors.black87,
-                      ),
-                    ),
+              Expanded(
+                child: GridView.builder(
+                  shrinkWrap: false,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    mainAxisExtent: 120,
+                    crossAxisCount: 2, // Number of columns in the grid
+                    crossAxisSpacing: 8.0, // Spacing between columns
+                    mainAxisSpacing: 0, // Spacing between rows
                   ),
+                  itemCount: networkInfoList.length,
+                  itemBuilder: (context, index) {
+                    var networkInfo = networkInfoList[index];
+                    return NetworkItem(
+                      icon: networkInfo.icon,
+                      title: networkInfo.title,
+                      response: networkData[networkInfo.title] ?? 'Loading...',
+                    );
+                  },
                 ),
+              ),
               Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
@@ -225,7 +228,10 @@ class _DashviewState extends State<Dashview> {
                     fetchNetworkData();
                   },
                   backgroundColor: Colors.black,
-                  child: Icon(Icons.refresh),
+                  child: Icon(
+                    Icons.refresh,
+                    size: 50,
+                  ),
                 ),
               ),
             ],
@@ -233,5 +239,57 @@ class _DashviewState extends State<Dashview> {
         ),
       ),
     );
+  }
+}
+
+class NetworkItem extends StatelessWidget {
+  const NetworkItem({
+    required this.icon,
+    required this.title,
+    required this.response,
+  });
+
+  final IconData icon;
+  final String response;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Container(
+          height: 100,
+          decoration: BoxDecoration(
+            border: Border.all(width: 2),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.black87,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  response,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }

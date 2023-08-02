@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mynetwork/screens/fix.dart';
+import 'package:mynetwork/screens/Activity.dart';
 import 'package:mynetwork/screens/wifi.dart';
-
+// import 'package:mynetwork/test/activity.dart';
 import 'speed.dart';
 
 class InternetPage extends StatelessWidget {
@@ -19,72 +19,101 @@ class InternetPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: Center(
         child: Container(
-          width: 320,
-          height: 700,
+          width: 350,
+          height: 600,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
+            border: Border.all(color: Colors.black, width: 3),
+            borderRadius: BorderRadius.circular(10),
             shape: BoxShape.rectangle,
           ),
           child: Padding(
             padding: EdgeInsets.all(20),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                CircularContainer(
+                Text(
+                  'Internet Services',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Container(
+                  width: 180,
+                  height: 2,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 2),
+                  ),
+                ),
+                SizedBox(height: 20),
+                RectangularContainer(
                   buttonText: 'My Wifi',
                   buttonIcon: Icons.wifi,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MyWifiWidget(
-                                ipAddress: ipAddress,
-                                username: username,
-                                password: password,
-                              )),
+                        builder: (context) => MyWifiWidget(
+                          ipAddress: ipAddress,
+                          username: username,
+                          password: password,
+                        ),
+                      ),
                     );
                   },
                 ),
                 SizedBox(height: 20),
-                CircularContainer(
+                RectangularContainer(
                   buttonText: 'Speed Test',
                   buttonIcon: Icons.speed,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => SpeedTestPage(
-                                ipAddress: ipAddress,
-                                username: username,
-                                password: password,
-                              )),
+                        builder: (context) => SpeedTestPage(
+                          ipAddress: ipAddress,
+                          username: username,
+                          password: password,
+                        ),
+                      ),
                     );
                   },
                 ),
                 SizedBox(height: 20),
-                CircularContainer(
-                  buttonText: 'Activty',
+                RectangularContainer(
+                  buttonText: 'Activity',
                   buttonIcon: Icons.bar_chart_outlined,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => MikrotikChartPage(
-                                ipAddress: ipAddress,
-                                username: username,
-                                password: password,
-                              )),
+                        builder: (context) => MikrotikChartPage(
+                          ipAddress: ipAddress,
+                          username: username,
+                          password: password,
+                        ),
+                      ),
                     );
                   },
                 ),
@@ -97,12 +126,12 @@ class InternetPage extends StatelessWidget {
   }
 }
 
-class CircularContainer extends StatelessWidget {
+class RectangularContainer extends StatelessWidget {
   final String buttonText;
   final IconData buttonIcon;
   final VoidCallback onTap;
 
-  const CircularContainer({
+  const RectangularContainer({
     required this.buttonText,
     required this.buttonIcon,
     required this.onTap,
@@ -113,27 +142,36 @@ class CircularContainer extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        width: 150,
-        height: 150,
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        height: 80,
         decoration: BoxDecoration(
           color: Colors.black,
-          shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(10),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              buttonIcon,
-              color: Colors.white,
-              size: 40,
+            Row(
+              children: [
+                Icon(
+                  buttonIcon,
+                  color: Colors.white,
+                  size: 40,
+                ),
+                SizedBox(width: 16),
+                Text(
+                  buttonText,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 10),
-            Text(
-              buttonText,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
+            Icon(
+              Icons.arrow_forward,
+              color: Colors.white,
+              size: 30,
             ),
           ],
         ),

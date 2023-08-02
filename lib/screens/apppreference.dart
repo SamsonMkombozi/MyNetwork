@@ -7,15 +7,14 @@ class PreferencePage extends StatefulWidget {
 
 class _PreferencePageState extends State<PreferencePage> {
   String _selectedLanguage = 'English';
-  Color _selectedColor = Colors.blue;
+  Color _selectedColor = Colors.red;
 
   // List of supported languages
   List<String> _languages = ['English', 'Spanish', 'French'];
 
   // List of supported theme colors
   List<Color> _colors = [
-    Colors.blue,
-    Colors.green,
+    Colors.black,
     Colors.red,
   ];
 
@@ -23,13 +22,21 @@ class _PreferencePageState extends State<PreferencePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: ListView(
         children: <Widget>[

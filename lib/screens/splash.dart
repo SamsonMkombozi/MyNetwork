@@ -23,18 +23,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 218, 32, 40),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'MyNetwork',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 52,
-                fontWeight: FontWeight.bold,
-              ),
+            Image.asset(
+              'lib/Assets/Mn-logo2.jpg',
+              width: 290,
+              height: 240,
             ),
             SizedBox(height: 16),
             CircularProgressIndicator(

@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   
-  http: ^0.13.6
+  http: ^1.1.0
   xml: ^6.3.0
   font_awesome_flutter: ^10.4.0
   share_plus: ^7.0.2
@@ -40,7 +40,14 @@ dependencies:
   provider: ^6.0.5
   flutter_local_notifications: ^15.1.0+1
   mysql1: ^0.20.0
+  convex_bottom_bar: ^3.2.0
+  google_fonts: ^5.1.0
+  flashy_tab_bar2: ^0.0.6
+  esp_smartconfig: ^1.1.11
+  wifi_iot: ^0.3.18
+  flutter_internet_speed_test: ^1.0.0
 
+  
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -50,6 +57,32 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.1
+
+
+
+
+
+
+
+  # min_sdk_android: 21 # android min sdk min:16, default 21
+
+  # web:
+  #   generate: true
+  #   image_path: "lib/Assets/logo2.png"
+  #   background_color: "#hexcode"
+  #   theme_color: "#hexcode"
+  # windows:
+  #   generate: true
+  #   image_path: "lib/Assets/logo2.png"
+  #   icon_size: 48 # min:48, max:256, default: 48
+  # macos:
+  #   generate: true
+  #   image_path: "lib/Assets/logo2.png"
+
+
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -58,6 +91,14 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "lib/Assets/logo2.png"
+
+flutter_native_splash:
+    image: lib/Assets/logo.png
+    color: "#da2028"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -70,9 +111,14 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - lib/Assets/Mn-logo.jpg
+    - lib/Assets/Mn-logo2.jpg
+    - lib/Assets/logo.png
+    - lib/Assets/logo2.png
+  
+
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

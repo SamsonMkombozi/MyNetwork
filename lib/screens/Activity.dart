@@ -28,17 +28,6 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
     _fetchDataForTab(0);
   }
 
-  Widget _buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      title: const Text(
-        'Activty',
-        textAlign: TextAlign.center,
-      ),
-      centerTitle: true,
-    );
-  }
-
   Widget _buildChart(int index) {
     if (_chartData.isEmpty || index >= _chartData.length) {
       return Center(child: CircularProgressIndicator());
@@ -46,7 +35,7 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
 
     return Container(
       color: Colors.white,
-      height: 100,
+      height: 200,
       width: 400,
       child: LineChart(
         LineChartData(
@@ -110,7 +99,21 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: Column(
         children: [
@@ -118,7 +121,7 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
             child: _buildChart(_selectedTabIndex),
           ),
           Container(
-            color: Colors.black,
+            color: Color.fromARGB(255, 218, 32, 40),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -140,13 +143,14 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
         _onTabSelected(index);
       },
       child: Container(
+        height: 100,
         padding: EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
               color: index == _selectedTabIndex
                   ? Colors.white
-                  : Colors.transparent,
+                  : Color.fromARGB(255, 218, 32, 40),
               width: 2.0,
             ),
           ),

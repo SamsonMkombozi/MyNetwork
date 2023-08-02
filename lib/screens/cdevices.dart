@@ -1,12 +1,17 @@
 // import 'package:device_info_plus/device_info_plus.dart';
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:mynetwork/screens/conndevices.dart';
 
 class ConnectedDevicesPage extends StatefulWidget {
   final String ipAddress;
   final String username;
   final String password;
+
   const ConnectedDevicesPage({
     Key? key,
     required this.ipAddress,
@@ -19,22 +24,6 @@ class ConnectedDevicesPage extends StatefulWidget {
 }
 
 class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
-  // DeviceInfoPlugin deviceInfor = DeviceInfoPlugin();
-  // AndroidDeviceInfo? androidInfo;
-  // WindowsDeviceInfo? windowsInfo;
-
-  // Future<AndroidDeviceInfo> getInfo() async {
-  //   return await deviceInfor.androidInfo;
-  // }
-
-  // Future<IosDeviceInfo> getIosInfo() async {
-  //   return await deviceInfor.iosInfo;
-  // }
-
-  // Future<WindowsDeviceInfo> getWinInfor() async {
-  //   return await deviceInfor.windowsInfo;
-  // }
-
   List<DeviceInfo> devices = [];
 
   String cdevices = '';
@@ -55,6 +44,16 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
             'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
       },
     );
+    final device = await http.get(
+      Uri.parse(
+          'http://${widget.ipAddress}/rest/interface/wireless/registration-table'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
@@ -92,6 +91,15 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
       // Update the device's block status
       setState(() {
         device.isBlocked = !device.isBlocked;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ConDevices(
+                    ipAddress: widget.ipAddress,
+                    username: widget.username,
+                    password: widget.password,
+                  )),
+        );
       });
       print(
           'Device ${device.name} ${device.isBlocked ? 'blocked' : 'unblocked'} successfully.');
@@ -125,13 +133,10 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-      ),
       body: Center(
         child: Container(
           width: 320,
-          height: 720,
+          height: 550,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.black),
             borderRadius: BorderRadius.circular(10.0),
@@ -139,7 +144,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
           child: Column(
             children: [
               SizedBox(
-                height: 40,
+                height: 50,
                 child: Container(
                   padding: EdgeInsets.only(top: 10),
                   decoration: BoxDecoration(
@@ -150,9 +155,20 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.devices),
+                      Icon(
+                        Icons.devices,
+                        color: Colors.black,
+                      ),
                       SizedBox(width: 10),
-                      Text('${devices.length} Connected Devices'),
+                      Text(
+                        '${devices.length} Connected Devices',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 25,
+                          fontWeight: FontWeight.w600,
+                          // decoration: TextDecoration.underline,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -178,8 +194,8 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
                         ),
                         trailing: IconButton(
                           icon: Icon(device.isBlocked
-                              ? Icons.block
-                              : Icons.check_circle),
+                              ? Icons.check_circle
+                              : Icons.block),
                           onPressed: () {
                             toggleDeviceBlockStatus(device);
                           },

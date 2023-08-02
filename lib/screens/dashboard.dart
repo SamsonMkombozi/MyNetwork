@@ -1,14 +1,16 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables
 
+import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 import 'package:mynetwork/reuseable_widget/notiffication.dart';
-import 'package:mynetwork/screens/dicoveryscreen.dart';
-// import 'package:mynetwork/screens/netscreen.dart';
+import 'package:mynetwork/screens/auth.dart';
 import 'package:mynetwork/screens/network.dart';
 import 'package:mynetwork/screens/settings.dart';
 import 'package:mynetwork/test/deviceinfo.dart';
-import 'package:mynetwork/testSql.dart';
 import 'dashview.dart';
+import 'package:http/http.dart' as http;
+
+import 'dart:convert';
 
 class Dash extends StatefulWidget {
   final String ipAddress;
@@ -53,175 +55,279 @@ class _DashState extends State<Dash> {
     ];
   }
 
+  Future<void> logout() async {
+    // Make HTTP request to upgrade router OS
+    final response = await http.get(
+      Uri.parse('http://${widget.ipAddress}/rest/logout'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        final snackBar = SnackBar(content: Text('logout Success'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
+    } else {
+      final snackBar = SnackBar(
+          content: Text('Error: ${response.statusCode}  ${response.body}'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    // Add any additional logic or error handling here
+  }
+
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(
-            Icons.account_box,
-            color: Colors.white,
-            size: 40,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Drawer(
-                  child: Container(
-                    color: Colors
-                        .white, // Set the background color of the drawer body to white
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: <Widget>[
-                        UserAccountsDrawerHeader(
-                          accountEmail: Text('    ' + widget.username),
-                          accountName: Text(widget.ipAddress),
-                          currentAccountPicture: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Text(
-                              "A",
-                              style: TextStyle(
-                                  fontSize: 40.0, color: Colors.black),
+        toolbarHeight: 170,
+
+        backgroundColor: const Color.fromARGB(255, 218, 32, 40),
+        actions: [
+          Row(
+            // crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: GestureDetector(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 2),
+                              color: Colors
+                                  .white, // Set the background color of the container
+                              shape: BoxShape
+                                  .circle, // Make the container circular
+                            ),
+                            width: 100,
+                            height: 100,
+                            child: Center(
+                              child: Text(
+                                'A',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 45,
+                                ),
+                              ),
                             ),
                           ),
-                          decoration: BoxDecoration(
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Admin',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ]),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Drawer(
+                          child: Container(
                             color: Colors
-                                .black, // Set the background color of the drawer header to black
+                                .white, // Set the background color of the drawer body to white
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              children: <Widget>[
+                                UserAccountsDrawerHeader(
+                                  accountEmail: Text('    ' + widget.username),
+                                  accountName: Text(widget.ipAddress),
+                                  currentAccountPicture: CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    child: Text(
+                                      "A",
+                                      style: TextStyle(
+                                          fontSize: 40.0, color: Colors.black),
+                                    ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        const Color.fromARGB(255, 218, 32, 40),
+
+                                    // Set the background color of the drawer header to black
+                                  ),
+                                ),
+                                ListTile(
+                                  leading: Icon(Icons.add),
+                                  title: Text("Users"),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                ListTile(
+                                  leading: Icon(Icons.control_point),
+                                  title: Text("Change Password"),
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                                ListTile(
+                                  leading: Icon(Icons.network_cell),
+                                  title: Text("Device Info"),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => deviceInfo(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                ListTile(
+                                    leading: Icon(Icons.logout_outlined),
+                                    title: Text("Log Out"),
+                                    onTap: () {
+                                      logout;
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                RouterConnectionPage()),
+                                      );
+                                    }),
+                              ],
+                            ),
                           ),
                         ),
-                        ListTile(
-                          leading: Icon(Icons.add),
-                          title: Text("Create Profiles"),
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.control_point),
-                          title: Text("Parental Control"),
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.network_cell),
-                          title: Text("DeviceInfo"),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => deviceInfo(),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.data_object_outlined),
-                          title: Text("Database"),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => sql(),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.device_hub_rounded),
-                          title: Text("Discovery Screen(test)"),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SliderViewPage(),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.logout_outlined),
-                          title: Text("Log Out"),
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            );
-          },
-        ),
+              SizedBox(
+                width: 180,
+              ),
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 40),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.notifications,
+                        color: Colors.white,
+                        size: 70,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Notiffication(
+                                // ipAddress: widget.ipAddress,
+                                // username: widget.username,
+                                // password: widget.password,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                  ))
+            ],
+          ),
+        ],
         // title: Center(
         //   child: Text(
         //     'MyNetwork',
         //     style: TextStyle(color: textPrimaryColor),
         //   ),
         // ),
-        actions: [
-          Padding(
-            padding: EdgeInsetsDirectional.only(end: 10),
-            child: IconButton(
-              icon: const Icon(
-                Icons.notifications,
-                color: Colors.white,
-                size: 40,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NotificationCenterPage(
-                      ipAddress: widget.ipAddress,
-                      username: widget.username,
-                      password: widget.password,
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: EdgeInsetsDirectional.only(end: 10),
+        //     child: IconButton(
+        //       icon: const Icon(
+        //         Icons.notifications,
+        //         color: Colors.white,
+        //         size: 40,
+        //       ),
+        //       onPressed: () {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (context) => NotificationCenterPage(
+        //               ipAddress: widget.ipAddress,
+        //               username: widget.username,
+        //               password: widget.password,
+        //             ),
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   )
+        // ],
       ),
       body: screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
+      bottomNavigationBar: FlashyTabBar(
+        backgroundColor: const Color.fromARGB(255, 218, 32, 40),
         items: [
-          BottomNavigationBarItem(
+          FlashyTabBarItem(
             icon: Icon(
               Icons.home,
               color: Colors.white,
-              size: 35,
+              size: 55,
             ),
-            label: 'Home',
+            title: Text(
+              'Home',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
+          FlashyTabBarItem(
             icon: Icon(
-              Icons.network_cell_rounded,
+              Icons.network_check_sharp,
               color: Colors.white,
-              size: 35,
+              size: 55,
             ),
-            label: 'Network',
+            title: Text(
+              'Network',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          BottomNavigationBarItem(
+          FlashyTabBarItem(
             icon: Icon(
               Icons.settings,
               color: Colors.white,
-              size: 35,
+              size: 55,
             ),
-            label: 'Settings',
+            title: Text(
+              'settings',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: textPrimaryColor,
-        onTap: (int index) {
+        height: 70,
+        showElevation: false,
+        selectedIndex: _currentIndex,
+        animationCurve: Curves.linear,
+        iconSize: 30,
+        onItemSelected: (int index) {
           setState(() {
             _currentIndex = index;
           });

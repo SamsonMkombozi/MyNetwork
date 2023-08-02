@@ -85,52 +85,60 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 218, 32, 40),
       body: Center(
         child: Theme(
           data: ThemeData(
             brightness: Brightness.dark,
           ),
           child: SingleChildScrollView(
-            child: Align(
-              alignment: Alignment.center,
-              child: Container(
-                padding: EdgeInsets.all(16.0),
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Positioned(
+                bottom: 22,
+                child: Image.asset(
+                  'lib/Assets/Mn-logo2.jpg',
+                  width: 300,
+                  height: 250,
+                ),
+              ),
+              Container(
+                width: 360,
+                height: 451,
+                // padding: EdgeInsets.only(left: 5, right: 5, bottom: 0),
                 child: Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
-                    side: BorderSide(color: Colors.black, width: 1),
+                    side: BorderSide(color: Colors.black, width: 3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(18.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        SizedBox(height: 2.0),
                         Text(
-                          'MyNetwork',
+                          'LogIn',
                           style: TextStyle(
-                            fontSize: 36.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 24.0),
-                        Text(
-                          'Log In',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 40.0,
+                            fontWeight: FontWeight.w600,
                             color: Colors.black,
                           ),
                         ),
                         SizedBox(height: 24.0),
                         TextFormField(
                           controller: ipAddressController,
+                          textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             labelText: 'IP Address',
-                            labelStyle: TextStyle(color: Colors.black),
+                            labelStyle: TextStyle(
+                              // textAlign: TextAlign.center,
+                              color: Colors.black,
+                            ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.black),
                               borderRadius: BorderRadius.circular(8),
@@ -144,6 +152,7 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                         SizedBox(height: 16.0),
                         TextFormField(
                           controller: usernameController,
+                          textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             labelText: 'Username',
@@ -161,6 +170,7 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                         SizedBox(height: 16.0),
                         TextFormField(
                           controller: passwordController,
+                          textAlign: TextAlign.center,
                           obscureText: true,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
@@ -180,6 +190,7 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                         ElevatedButton(
                           onPressed: connectToRouter,
                           style: ElevatedButton.styleFrom(
+                            minimumSize: Size(200, 60),
                             primary: Colors.black,
                             padding: EdgeInsets.symmetric(
                               horizontal: 40,
@@ -189,9 +200,9 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                           child: Text(
                             'Connect',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.0,
-                            ),
+                                color: Colors.white,
+                                fontSize: 25.0,
+                                fontWeight: FontWeight.w500),
                           ),
                         ),
                         SizedBox(height: 24.0),
@@ -206,8 +217,8 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                   ),
                 ),
               ),
-            ),
-          ),
+            ],
+          )),
         ),
       ),
     );

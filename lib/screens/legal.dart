@@ -5,13 +5,21 @@ class LegalPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: SingleChildScrollView(
         child: Padding(
