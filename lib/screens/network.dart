@@ -30,69 +30,70 @@ class _NetworkState extends State<Network> {
         padding: const EdgeInsets.all(9.0),
         child: Center(
           child: Container(
-            width: 320,
-            height: 600,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black, width: 3),
-              borderRadius: BorderRadius.circular(10),
-              shape: BoxShape.rectangle,
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularContainer(
-                    buttonText: 'Internet',
-                    buttonIcon: Icons.signal_cellular_alt,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => InternetPage(
-                                  ipAddress: widget.ipAddress,
-                                  username: widget.username,
-                                  password: widget.password,
-                                )),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  CircularContainer(
-                    buttonText: 'Hardware',
-                    buttonIcon: Icons.router,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RouterPage(
-                                  ipAddress: widget.ipAddress,
-                                  username: widget.username,
-                                  password: widget.password,
-                                )),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  CircularContainer(
-                    buttonText: 'Devices',
-                    buttonIcon: Icons.devices,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ConDevices(
-                                  ipAddress: widget.ipAddress,
-                                  username: widget.username,
-                                  password: widget.password,
-                                )),
-                      );
-                    },
-                  ),
-                ],
+              width: 320,
+              height: 600,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 3),
+                borderRadius: BorderRadius.circular(10),
+                shape: BoxShape.rectangle,
               ),
-            ),
-          ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularContainer(
+                        buttonText: 'Internet',
+                        buttonIcon: Icons.signal_cellular_alt,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InternetPage(
+                                      ipAddress: widget.ipAddress,
+                                      username: widget.username,
+                                      password: widget.password,
+                                    )),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      CircularContainer(
+                        buttonText: 'Hardware',
+                        buttonIcon: Icons.router,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RouterPage(
+                                      ipAddress: widget.ipAddress,
+                                      username: widget.username,
+                                      password: widget.password,
+                                    )),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      CircularContainer(
+                        buttonText: 'Devices',
+                        buttonIcon: Icons.devices,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ConDevices(
+                                      ipAddress: widget.ipAddress,
+                                      username: widget.username,
+                                      password: widget.password,
+                                    )),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              )),
         ),
       ),
     );

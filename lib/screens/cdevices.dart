@@ -45,8 +45,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
       },
     );
     final device = await http.get(
-      Uri.parse(
-          'http://${widget.ipAddress}/rest/interface/wireless/registration-table'),
+      Uri.parse('http://${widget.ipAddress}/rest/ip/dhcp-server/lease'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':

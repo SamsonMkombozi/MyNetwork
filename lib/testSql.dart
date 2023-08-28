@@ -1,77 +1,29 @@
-import 'package:flutter/material.dart';
-import 'package:mynetwork/db/mysql.dart';
+import 'package:mysql1/mysql1.dart';
 
-class sql extends StatefulWidget {
-  const sql({super.key});
+class Mysql {
+  static String host = 'https://databases.000webhost.com/';
+  static String user = 'id21131144_samson';
+  static String password = 'Damsam@2015';
+  static String db = 'id21131144_bandwidth';
+  static int port = 3306;
 
-  @override
-  State<sql> createState() => _sqlState();
-}
+  Mysql();
+  static ConnectionSettings settings = ConnectionSettings(
+    host: host,
+    port: port,
+    user: user,
+    password: password,
+    db: db,
+  );
 
-class _sqlState extends State<sql> {
-  var db = new Mysql();
-  var mail = '';
-  void _getCustomer() {
-    var conn;
-    db.getConnection().then((conn));
-    String sql = 'select customer from etbwmgr.customers where id = 10';
-    conn.query(sql).then((results) {
-      for (var row in results) {
-        setState(() {
-          mail = row[0];
-        });
-      }
-    }).catchError((error) {
-      // Handle query error
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Data Fetch Failed'),
-            content: Text('An error occurred while fetching data for $error'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
-        body: Align(
-          alignment: Alignment.center,
-          child: Container(
-            color: Colors.white,
-            alignment: Alignment.bottomCenter,
-            child: Center(
-              child: Column(
-                children: [
-                  Text('Mail: '),
-                  Text(
-                    mail,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ));
+  static Future<MySqlConnection?> connect() async {
+    try {
+      final MySqlConnection connection =
+          await MySqlConnection.connect(settings);
+      return connection;
+    } catch (e) {
+      print('Error connecting to the database: $e');
+      return null; // Return null to indicate connection failure
+    }
   }
 }

@@ -27,6 +27,12 @@ class _RouterPageState extends State<RouterPage> {
   String uploadSpeed = '';
   String downloadSpeed = '';
 
+  double _parseSpeed(String speed) {
+    double bytes = double.tryParse(speed) ?? 0.0;
+    double megabits = bytes / (1024 * 1024); // Convert bytes to megabits
+    return megabits;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -59,8 +65,8 @@ class _RouterPageState extends State<RouterPage> {
       setState(() {
         routerName = data['architecture-name'];
         routerOsVersion = data['version'];
-        downloadSpeed = data2[0]['rx-bytes'] ?? 'N/A';
-        uploadSpeed = data2[0]['tx-bytes'] ?? 'N/A';
+        downloadSpeed = _parseSpeed(data2[0]['rx-bytes']).toStringAsFixed(2);
+        uploadSpeed = _parseSpeed(data2[0]['tx-bytes']).toStringAsFixed(2);
       });
     } else {
       print('failed');
@@ -85,9 +91,9 @@ class _RouterPageState extends State<RouterPage> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } else {
-      final snackBar = SnackBar(
-          content: Text('Error: ${response.statusCode}  ${response.body}'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      // final snackBar = SnackBar(
+      //     content: Text('Error: ${response.statusCode}  ${response.body}'));
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
     // Add any additional logic or error handling here
@@ -151,139 +157,131 @@ class _RouterPageState extends State<RouterPage> {
         ),
       ),
       body: Center(
-        child: Padding(
-          padding: EdgeInsets.only(top: 90),
-          child: Column(
-            children: [
-              Container(
-                width: 350.0,
-                height: 366.0,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.black, width: 3),
-                  borderRadius: BorderRadius.circular(10.0),
+        child: SingleChildScrollView(
+          child: Container(
+            width: 350.0,
+            height: 366.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.black, width: 3),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 10,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      height: 10,
+                Text(
+                  'Mikrotik Router',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  '-$routerName-',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'RouterOS Version',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 23,
+                      fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  '-$routerOsVersion-',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(
+                  height: 23,
+                ),
+                Container(
+                    width: 300,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 240, 240, 240),
+                      shape: BoxShape
+                          .rectangle, // Set the shape to circle for IconButton with circular border
+                      border: Border.all(
+                        color: Colors.black,
+                        width: 3,
+                      ),
                     ),
-                    Text(
-                      'Mikrotik Router',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '-$routerName-',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      'RouterOS Version',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 23,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '-$routerOsVersion-',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 23,
-                    ),
-                    Container(
-                        width: 300,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 240, 240, 240),
-                          shape: BoxShape
-                              .rectangle, // Set the shape to circle for IconButton with circular border
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 3,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 9),
-                          child: Row(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 9),
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 30,
+                            ),
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                const SizedBox(
-                                  width: 30,
+                                Icon(
+                                  Icons.arrow_upward,
+                                  size: 35,
+                                  weight: 600,
                                 ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_upward,
-                                      size: 35,
-                                      weight: 600,
-                                    ),
-                                    Text(
-                                      'Upload Speed',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    Text(
-                                      ' $uploadSpeed',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
+                                Text(
+                                  'Upload Speed',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
                                 ),
-                                const SizedBox(
-                                  width: 40,
+                                Text(
+                                  ' $uploadSpeed Mbps',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
                                 ),
-                                Column(
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_downward,
-                                      size: 35,
-                                      weight: 600,
-                                    ),
-                                    Text(
-                                      'Download Speed',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    Text(
-                                      '$downloadSpeed',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 40,
+                            ),
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.arrow_downward,
+                                  size: 35,
+                                  weight: 600,
                                 ),
-                                SizedBox(
-                                  height: 10,
+                                Text(
+                                  'Download Speed',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
                                 ),
-                              ]),
-                        )),
-                    const SizedBox(
-                      height: 30,
-                    ),
-                  ],
+                                Text(
+                                  '$downloadSpeed Mbps',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                          ]),
+                    )),
+                const SizedBox(
+                  height: 30,
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -303,13 +301,13 @@ class _RouterPageState extends State<RouterPage> {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: const Text(
-                            'Reboot',
+                            'Update',
                             style: TextStyle(
                                 fontSize: 30, fontWeight: FontWeight.w600),
                             textAlign: TextAlign.center,
                           ),
                           content: Text(
-                            'Do You Want To Reboot Router?',
+                            'Do You Want To update RouterOs?',
                             style: TextStyle(
                                 fontSize: 25, fontWeight: FontWeight.w300),
                             textAlign: TextAlign.center,
@@ -322,17 +320,18 @@ class _RouterPageState extends State<RouterPage> {
                                     fontSize: 20, fontWeight: FontWeight.w400),
                               ),
                               onPressed: () {
-                                rebootRouter();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Dash(
-                                      ipAddress: widget.ipAddress,
-                                      username: widget.username,
-                                      password: widget.password,
-                                    ),
-                                  ),
-                                );
+                                upgradeRouterOs();
+                                Navigator.of(context).pop();
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //     builder: (context) => Dash(
+                                //       ipAddress: widget.ipAddress,
+                                //       username: widget.username,
+                                //       password: widget.password,
+                                //     ),
+                                //   ),
+                                // );
                               },
                             ),
                             SizedBox(

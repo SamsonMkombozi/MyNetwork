@@ -11,7 +11,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Simulate a delay for the splash screen
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 4), () {
       // Navigate to the actual home screen
       Navigator.pushReplacement(
         context,
@@ -34,7 +34,12 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 240,
             ),
             SizedBox(height: 16),
+            // LinearProgressIndicator(
+            //   color: Colors.black,
+            //   minHeight: 12,
+            // ),
             CircularProgressIndicator(
+              strokeWidth: 8,
               color: Colors.black,
             ),
           ],

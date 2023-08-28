@@ -1,21 +1,18 @@
-// ignore_for_file: unused_local_variable
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// import 'package:mynetwork/screens/conndevices.dart';
 
 class AccessListPage extends StatefulWidget {
-  final String ipAddress;
-  final String username;
-  final String password;
-
   const AccessListPage({
     Key? key,
     required this.ipAddress,
     required this.username,
     required this.password,
   }) : super(key: key);
+
+  final String ipAddress;
+  final String password;
+  final String username;
 
   @override
   _AccessListPageState createState() => _AccessListPageState();
@@ -43,15 +40,13 @@ class _AccessListPageState extends State<AccessListPage> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body) as List<dynamic>;
-      final fetchedAccessList = data
-          .map((item) => AccessListItem(
-                macAddress: item['mac-address'],
-                // deviceName: item['device_name'],
-              ))
-          .toList();
-
       setState(() {
-        accessList = fetchedAccessList;
+        accessList = data
+            .map((item) => AccessListItem(
+                  indexNo: item['.id'],
+                  macAddress: item['mac-address'],
+                ))
+            .toList();
       });
     } else {
       showDialog(
@@ -77,41 +72,46 @@ class _AccessListPageState extends State<AccessListPage> {
   }
 
   Future<void> deleteAccessListItem(int index) async {
-    // final macAddress = accessList[index].macAddress;
-    final response = await http.post(
+    await fetchAccessList(); // Fetch the latest data from the server
+
+    if (index >= 0 && index < accessList.length) {
+      final response = await http.post(
         Uri.parse(
-            'http://${widget.ipAddress}/rest/interface/wireless/access-list/remove'),
+          'http://${widget.ipAddress}/rest/interface/wireless/access-list/remove',
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Authorization':
               'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
         },
-        body: json.encode({'numbers': accessList[index].macAddress}));
-    // final response = await http.delete(Uri.parse('$apiUrl/$index'));
-    if (response.statusCode == 200) {
-      setState(() {
-        // accessList.removeAt(index);
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Data Fetch Failed'),
-            content: Text(
-              'Failed to fetch data. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
-            ),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
+        body: json.encode({'numbers': '$index'}),
       );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          accessList.removeAt(index);
+        });
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Data Delete Failed'),
+              content: Text(
+                'Failed to delete data. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -127,7 +127,6 @@ class _AccessListPageState extends State<AccessListPage> {
             borderRadius: BorderRadius.circular(10.0),
           ),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
                 height: 50,
@@ -149,30 +148,12 @@ class _AccessListPageState extends State<AccessListPage> {
                           fontFamily: 'Poppins',
                           fontSize: 25,
                           fontWeight: FontWeight.w600,
-                          // decoration: TextDecoration.underline,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              // ListView.builder(
-              //   itemCount: accessList.length,
-              //   itemBuilder: (context, index) {
-              //     final accessListItem = accessList[index];
-
-              //     return Card(
-              //       child: ListTile(
-              //         // title: Text(accessListItem.deviceName),
-              //         subtitle: Text(accessListItem.macAddress),
-              //         trailing: IconButton(
-              //           icon: Icon(Icons.delete),
-              //           onPressed: () => deleteAccessListItem(index),
-              //         ),
-              //       ),
-              //     );
-              //   },
-              // ),
               Expanded(
                 child: ListView.builder(
                   itemCount: accessList.length,
@@ -181,7 +162,7 @@ class _AccessListPageState extends State<AccessListPage> {
 
                     return Card(
                       child: ListTile(
-                        // title: Text(accessListItem.deviceName),
+                        title: Text(accessListItem.indexNo as String),
                         subtitle: Text(accessListItem.macAddress),
                         trailing: IconButton(
                           icon: Icon(Icons.delete),
@@ -202,10 +183,10 @@ class _AccessListPageState extends State<AccessListPage> {
 
 class AccessListItem {
   final String macAddress;
-  // final String deviceName;
+  final String indexNo;
 
   AccessListItem({
     required this.macAddress,
-    // required this.deviceName,
+    required this.indexNo,
   });
 }

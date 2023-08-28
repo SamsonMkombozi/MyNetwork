@@ -45,7 +45,16 @@ dependencies:
   flashy_tab_bar2: ^0.0.6
   esp_smartconfig: ^1.1.11
   wifi_iot: ^0.3.18
-  flutter_internet_speed_test: ^1.0.0
+  speed_test_dart: ^1.0.5+0
+  process: ^4.2.4
+  kdgaugeview: ^1.0.5
+  shared_preferences: ^2.2.0
+  awesome_notifications: ^0.7.4+1
+  webview_flutter: ^3.0.1
+  flutter_tawk: ^0.1.0
+  url_launcher: ^6.1.12
+  flutter_email_sender: ^6.0.1
+  whatsapp_unilink: ^2.1.0
 
   
 
@@ -53,6 +62,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   device_info_plus: ^9.0.2
+  nb_utils: ^6.0.2
 
 dev_dependencies:
   flutter_test:
@@ -66,21 +76,7 @@ dev_dependencies:
 
 
 
-  # min_sdk_android: 21 # android min sdk min:16, default 21
-
-  # web:
-  #   generate: true
-  #   image_path: "lib/Assets/logo2.png"
-  #   background_color: "#hexcode"
-  #   theme_color: "#hexcode"
-  # windows:
-  #   generate: true
-  #   image_path: "lib/Assets/logo2.png"
-  #   icon_size: 48 # min:48, max:256, default: 48
-  # macos:
-  #   generate: true
-  #   image_path: "lib/Assets/logo2.png"
-
+ 
 
 
 
@@ -92,13 +88,49 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter_launcher_icons:
-  android: true
+  android: "launcher_icon"
   ios: true
   image_path: "lib/Assets/logo2.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "lib/Assets/logo2.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "lib/Assets/logoB.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "lib/Assets/logoB.png"
+
 
 flutter_native_splash:
-    image: lib/Assets/logo.png
+  image: lib/Assets/logo2.png
+  color: "#da2028"
+  android: true
+  ios: true
+  web: true
+  color_android: "#da2028"
+  color_ios: "#da2028"
+  color_web: "#da2028"
+  image_android: lib/Assets/logo.png
+  image_ios: lib/Assets/logo.png
+  image_web: lib/Assets/logo.png
+  # background_image_android: "assets/background-android.png"
+  # background_image_ios: "assets/background-ios.png"
+  branding_android: lib/Assets/logo2.png
+  branding_ios: lib/Assets/logo2.png
+  android_12:
+    image: lib/Assets/logo2.png
+    # Splash screen background color.
     color: "#da2028"
+    # App icon background color.
+    # icon_background_color: "#111111"
+    # The branding property allows you to specify an image used as branding in the splash screen.
+    # branding: lib/Assets/logo.png
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -112,10 +144,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/Assets/Mn-logo.jpg
-    - lib/Assets/Mn-logo2.jpg
-    - lib/Assets/logo.png
-    - lib/Assets/logo2.png
+    - lib/Assets/
+    # - lib/Assets/Mn-logo2.jpg
+    # - lib/Assets/logo.png
+    # - lib/Assets/logo2.png
   
 
     

@@ -127,24 +127,31 @@
 // ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
 import 'dart:convert';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mynetwork/Services/notification_service.dart';
+import 'package:mynetwork/reuseable_widget/NotificationButton.dart';
+import 'package:mynetwork/screens/router.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Notiffication extends StatefulWidget {
-  // final String ipAddress;
-  // final String username;
-  // final String password;
+  final String ipAddress;
+  final String username;
+  final String password;
 
-  // const SpeedTestPage({
-  //   Key? key,
-  //   required this.ipAddress,
-  //   required this.username,
-  //   required this.password,
-  // }) : super(key: key);
+  const Notiffication({
+    Key? key,
+    required this.ipAddress,
+    required this.username,
+    required this.password,
+  }) : super(key: key);
 
   @override
   _NotifficationState createState() => _NotifficationState();
 }
+
+
 
 class _NotifficationState extends State<Notiffication> {
   @override
@@ -259,31 +266,122 @@ class _NotifficationState extends State<Notiffication> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Notification',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Container(
-                          width: 180,
-                          height: 2,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        RectangularContainer(
-                          buttonText: 'New Device Connected',
-                          onTap: () {},
-                        ),
-                        SizedBox(height: 20),
-                      ],
+                    child: SingleChildScrollView(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Notifications',
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Container(
+                              width: 180,
+                              height: 2,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.black, width: 2),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            RectangularContainer(
+                              buttonText: 'New Update',
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RouterPage(
+                                            ipAddress: widget.ipAddress,
+                                            username: widget.username,
+                                            password: widget.password,
+                                          )),
+                                );
+                              },
+                            ),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                                child: Text('Send'), onPressed: () {})
+                            // NotificationButton(
+                            //     text: "Normal Notification",
+                            //     onPressed: () async {
+                            //       await NotificationService.showNotification(
+                            //         title: "Title of the Notification",
+                            //         body: "Body of the Notification",
+                            //         // acTionButtons: [],
+                            //       );
+                            //     }),
+                            // NotificationButton(
+                            //     text: "Notification with Summary",
+                            //     onPressed: () async {
+                            //       await NotificationService.showNotification(
+                            //         title: "Title of the Notification",
+                            //         body: "Body of the Notification",
+                            //         summary: "small Summary",
+                            //         notificationLayout:
+                            //             NotificationLayout.Inbox,
+                            //         // acTionButtons: [],
+                            //       );
+                            //     }),
+                            // NotificationButton(
+                            //     text: "Progress Bar Notification",
+                            //     onPressed: () async {
+                            //       await NotificationService.showNotification(
+                            //         title: "Title of the Notification",
+                            //         body: "Body of the Notification",
+                            //         summary: "small Summary",
+                            //         notificationLayout:
+                            //             NotificationLayout.ProgressBar,
+                            //         // acTionButtons: [],
+                            //       );
+                            //     }),
+                            // NotificationButton(
+                            //     text: "Message Notification",
+                            //     onPressed: () async {
+                            //       await NotificationService.showNotification(
+                            //         title: "Title of the Notification",
+                            //         body: "Body of the Notification",
+                            //         summary: "small Summary",
+                            //         notificationLayout:
+                            //             NotificationLayout.Messaging,
+                            //         // acTionButtons: [],
+                            //       );
+                            //     }),
+                            // NotificationButton(
+                            //     text: "Big Image Notification",
+                            //     onPressed: () async {
+                            //       await NotificationService.showNotification(
+                            //         title: "Title of the Notification",
+                            //         body: "Body of the Notification",
+                            //         summary: "small Summary",
+                            //         notificationLayout:
+                            //             NotificationLayout.BigPicture,
+                            //         bigPicture: "",
+                            //       );
+                            //     }),
+                            // NotificationButton(
+                            //     text: "Action Button Notification",
+                            //     onPressed: () async {
+                            //       await NotificationService.showNotification(
+                            //         title: "Title of the Notification",
+                            //         body: "Body of the Notification",
+                            //         payload: {
+                            //           "navigate": "true",
+                            //         },
+                            //         acTionButtons: [
+                            //           NotificationActionButton(
+                            //             key: "check",
+                            //             label: "check it out",
+                            //             actionType: ActionType.SilentAction,
+                            //             color: Colors.green,
+                            //           )
+                            //         ],
+                            // actionButtons: [],
+                            //       );
+                            //     })
+                          ]),
                     ),
                   ),
                 ),
@@ -337,7 +435,7 @@ class RectangularContainer extends StatelessWidget {
               ],
             ),
             Icon(
-              Icons.arrow_forward,
+              Icons.download,
               color: Colors.white,
               size: 30,
             ),

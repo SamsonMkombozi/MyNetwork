@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynetwork/screens/dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RouterConnectionPage extends StatefulWidget {
   @override
@@ -12,8 +13,6 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
   TextEditingController ipAddressController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  String responseMessage = '';
 
   Future connectToRouter() async {
     String ipAddress = ipAddressController.text;
@@ -28,9 +27,10 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
         'Content-Type': 'application/json',
         'Authorization': 'Basic $encodedCredentials',
       },
-    ).then((response) {
+    ).then((response) async {
       print('Response: ${response.body}');
       if (response.statusCode == 200) {
+        AuthProvider().login();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -99,8 +99,8 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                 bottom: 22,
                 child: Image.asset(
                   'lib/Assets/Mn-logo2.jpg',
-                  width: 300,
-                  height: 250,
+                  width: 280,
+                  height: 230,
                 ),
               ),
               Container(
@@ -188,7 +188,10 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                         ),
                         SizedBox(height: 24.0),
                         ElevatedButton(
-                          onPressed: connectToRouter,
+                          onPressed: () {
+                            connectToRouter();
+                            // AuthProvider().login();
+                          },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(200, 60),
                             primary: Colors.black,
@@ -206,12 +209,12 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                           ),
                         ),
                         SizedBox(height: 24.0),
-                        Text(
-                          responseMessage,
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
+                        // Text(
+                        //   responseMessage,
+                        //   style: TextStyle(
+                        //     color: Colors.black,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -222,5 +225,34 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
         ),
       ),
     );
+  }
+}
+
+class AuthProvider with ChangeNotifier {
+  bool _isLoggedIn = false;
+
+  bool get isLoggedIn => _isLoggedIn;
+
+  AuthProvider() {
+    checkLoginStatus();
+  }
+  Future<void> checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    notifyListeners();
+  }
+
+  Future<void> login() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+    _isLoggedIn = true;
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+    _isLoggedIn = false;
+    notifyListeners();
   }
 }

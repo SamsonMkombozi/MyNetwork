@@ -21,73 +21,92 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Text(
-              'Settings',
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
+    return Scaffold(
+      appBar: AppBar(
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Settings',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 16.0),
-          SettingsOption(
-            icon: Icons.settings,
-            title: 'App Preferences',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PreferencePage(),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16.0),
-          SettingsOption(
-            icon: Icons.account_circle,
-            title: 'Account',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AccountSettingsPage(),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16.0),
-          SettingsOption(
-            icon: Icons.gavel,
-            title: 'Legal',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LegalPage(),
-                ),
-              );
-            },
-          ),
-          SizedBox(height: 16.0),
-          SettingsOption(
-            icon: Icons.feedback,
-            title: 'Leave Us Feedback',
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => FeedbackPage(),
-              //   ),
-              // );
-            },
-          ),
-        ],
+            SizedBox(height: 16.0),
+            SettingsOption(
+              icon: Icons.settings,
+              title: 'App Preferences',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PreferencePage(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 16.0),
+            SettingsOption(
+              icon: Icons.account_circle,
+              title: 'Account',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AccountSettingsPage(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 16.0),
+            SettingsOption(
+              icon: Icons.gavel,
+              title: 'Legal',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LegalPage(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 16.0),
+            SettingsOption(
+              icon: Icons.feedback,
+              title: 'Leave Us Feedback',
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => FeedbackPage(),
+                //   ),
+                // );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

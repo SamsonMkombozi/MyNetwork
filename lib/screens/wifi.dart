@@ -266,7 +266,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                         height: 15,
                       ),
                       Text(
-                        'Username',
+                        'SSID',
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 20),
                       ),

@@ -91,11 +91,7 @@ class InternetPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SpeedTestPage(
-                          ipAddress: ipAddress,
-                          username: username,
-                          password: password,
-                        ),
+                        builder: (context) => SpeedTestPage(),
                       ),
                     );
                   },

@@ -1,110 +1,181 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_internet_speed_test/flutter_internet_speed_test.dart';
+import 'dart:convert';
+import 'dart:io';
 
-// void main() {
-//   runApp(MyApp());
-// }
+import 'package:flutter/material.dart';
+import 'package:speed_test_dart/classes/classes.dart';
+import 'package:speed_test_dart/speed_test_dart.dart';
 
-// class MyApp extends StatefulWidget {
-//   @override
-//   _MyAppState createState() => _MyAppState();
-// }
+void main() => runApp(const Speed());
 
-// class _MyAppState extends State<MyApp> {
-//   InternetSpeedTest _internetSpeedTest;
-//   double _downloadSpeed = 0.0;
-//   double _uploadSpeed = 0.0;
+class Speed extends StatefulWidget {
+  const Speed({super.key});
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     _internetSpeedTest = InternetSpeedTest();
-//     _startSpeedTest();
-//   }
+  @override
+  State<Speed> createState() => _SpeedState();
+}
 
-//   void _startSpeedTest() async {
-//     try {
-//       SpeedTestResult result = await _internetSpeedTest.startTesting(
-//         useFastApi: true,
-//         onStarted: () {
-//           print('Speed test started');
-//         },
-//         onCompleted: (TestResult download, TestResult upload) {
-//           print('Speed test completed');
-//           setState(() {
-//             _downloadSpeed = download.download;
-//             _uploadSpeed = upload.upload;
-//           });
-//         },
-//         onProgress: (double percent, TestResult data) {
-//           print('Speed test in progress: $percent');
-//           if (data is TestResultDownload) {
-//             _downloadSpeed = data.download;
-//           } else if (data is TestResultUpload) {
-//             _uploadSpeed = data.upload;
-//           }
-//         },
-//         onError: (String errorMessage, String speedTestError) {
-//           print('Speed test error: $errorMessage, $speedTestError');
-//         },
-//         onDefaultServerSelectionInProgress: () {
-//           print('Default server selection in progress');
-//         },
-//         onDefaultServerSelectionDone: (Client client) {
-//           print('Default server selection done: $client');
-//         },
-//         onDownloadComplete: (TestResult data) {
-//           print('Download complete: $data');
-//         },
-//         onUploadComplete: (TestResult data) {
-//           print('Upload complete: $data');
-//         },
-//         onCancel: () {
-//           print('Speed test cancelled');
-//         },
-//       );
-//     } catch (e) {
-//       print(e);
-//     }
-//   }
+class _SpeedState extends State<Speed> {
+  SpeedTestDart tester = SpeedTestDart();
+  List<Server> bestServersList = [];
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Speed Test',
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: Text('Flutter Speed Test'),
-//         ),
-//         body: Center(
-//           child: Column(
-//             children: [
-//               Text(
-//                 'Download Speed: ${_downloadSpeed.toStringAsFixed(2)} Mbps',
-//                 style: TextStyle(fontSize: 20),
-//               ),
-//               Gauge(
-//                 value: _downloadSpeed,
-//                 minValue: 0,
-//                 maxValue: 1000,
-//                 width: 200,
-//                 height: 200,
-//               ),
-//               Text(
-//                 'Upload Speed: ${_uploadSpeed.toStringAsFixed(2)} Mbps',
-//                 style: TextStyle(fontSize: 20),
-//               ),
-//               Gauge(
-//                 value: _uploadSpeed,
-//                 minValue: 0,
-//                 maxValue: 1000,
-//                 width: 200,
-//                 height: 200,
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+  double downloadRate = 0;
+  double uploadRate = 0;
+
+  bool readyToTest = false;
+  bool loadingDownload = false;
+  bool loadingUpload = false;
+
+  Future<void> setBestServers() async {
+    final settings = await tester.getSettings();
+    final servers = settings.servers;
+
+    final _bestServersList = await tester.getBestServers(
+      servers: servers,
+    );
+
+    setState(() {
+      bestServersList = _bestServersList;
+      readyToTest = true;
+    });
+  }
+
+  Future<void> _testDownloadSpeed() async {
+    setState(() {
+      loadingDownload = true;
+    });
+    final _downloadRate =
+        await tester.testDownloadSpeed(servers: bestServersList);
+    setState(() {
+      downloadRate = _downloadRate;
+      loadingDownload = false;
+    });
+  }
+
+  Future<void> _testUploadSpeed() async {
+    setState(() {
+      loadingUpload = true;
+    });
+
+    final _uploadRate = await tester.testUploadSpeed(servers: bestServersList);
+
+    setState(() {
+      uploadRate = _uploadRate;
+      loadingUpload = false;
+    });
+  }
+  void runSpeedtestCLI() async {
+  final result = await Process.run('speedtest', []);
+  final output = utf8.decode(result.stdout);
+
+  print('Speedtest Output: $output');
+}
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setBestServers();
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Speed Test Example App'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Download Test:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              if (loadingDownload)
+                Column(
+                  children: const [
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text('Testing download speed...'),
+                  ],
+                )
+              else
+                Text('Download rate  ${downloadRate.toStringAsFixed(2)} Mb/s'),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: readyToTest && !loadingDownload
+                      ? Colors.blue
+                      : Colors.grey,
+                ),
+                onPressed: loadingDownload
+                    ? null
+                    : () async {
+                        if (!readyToTest || bestServersList.isEmpty) return;
+                        await _testDownloadSpeed();
+                      },
+                child: const Text('Start'),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              const Text(
+                'Upload Test:',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              if (loadingUpload)
+                Column(
+                  children: const [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 10),
+                    Text('Testing upload speed...'),
+                  ],
+                )
+              else
+                Text('Upload rate ${uploadRate.toStringAsFixed(2)} Mb/s'),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: readyToTest ? Colors.blue : Colors.grey,
+                ),
+                onPressed: loadingUpload
+                    ? null
+                    : () async {
+                        if (!readyToTest || bestServersList.isEmpty) return;
+                        await _testUploadSpeed();
+                      },
+                child: const Text('Start'),
+              ),
+
+              ElevatedButton(
+  onPressed: () {
+    runSpeedtestCLI();
+  },
+  child: Text('Run Speedtest'),
+)
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

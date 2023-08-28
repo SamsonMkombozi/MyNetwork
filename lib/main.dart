@@ -1,10 +1,10 @@
 // ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-// import 'package:mynetwork/reuseable_widget/notiffication.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mynetwork/screens/splash.dart';
-// import 'package:provider/provider.dart';
 
 // void main() {
 //   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -15,10 +15,28 @@ import 'package:mynetwork/screens/splash.dart';
 // whenever your initialization is completed, remove the splash screen:
 // FlutterNativeSplash.remove();
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp());
+
+  // FlutterLocalNotificationsPlugin.initialize(
+  //   // TODO: Add your app's registration token here.
+  //   initializationSettings: InitializationSettings(
+  //     android: AndroidInitializationSettings(
+  //       notificationChannelId: 'my_channel_id',
+  //       notificationChannelName: 'My App Notifications',
+  //       notificationChannelDescription: 'This channel is used for notifications from my app',
+  //     ),
+  //     ios: IOSInitializationSettings(),
+  //   ),
+  // );
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -31,11 +49,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class AuthProvider with ChangeNotifier {
+  bool _isLoggedIn = false;
 
-// ChangeNotifierProvider(
-//       create: (context) => DeviceProvider(),
-//       child: MaterialApp(
-//         debugShowCheckedModeBanner: false,
-//         home: SplashScreen(),
-//       ),
-//     );
+  bool get isLoggedIn => _isLoggedIn;
+
+  AuthProvider() {
+    checkLoginStatus();
+  }
+  Future<void> checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    notifyListeners();
+  }
+}

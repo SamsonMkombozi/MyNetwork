@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+// import 'package:mynetwork/db/employee.dart';
 
 class MikrotikChartPage extends StatefulWidget {
   final String ipAddress;
@@ -20,6 +21,8 @@ class MikrotikChartPage extends StatefulWidget {
 class _MikrotikChartPageState extends State<MikrotikChartPage> {
   List<List<FlSpot>> _chartData = [];
   int _selectedTabIndex = 0;
+  // var db = new Mysql();
+  // var mail = '';
 
   @override
   void initState() {
@@ -74,13 +77,13 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
     // Dummy data for the line chart for different timelines.
     List<List<double>> dummyData = [
       // Day
-      [0, 10, 20, 30, 25, 15, 5],
+      [0, 1000, 2000, 3000, 2500, 1500, 5000],
       // Week
-      [0, 20, 15, 10, 35, 30, 20],
+      [0, 2000, 1500, 1000, 3500, 3000, 2000],
       // Month
-      [0, 25, 30, 20, 35, 45, 50],
+      [0, 2500, 3000, 2000, 3500, 4500, 5000],
       // Year
-      [0, 15, 10, 25, 20, 35, 30],
+      [0, 1500, 1000, 2500, 2000, 3500, 3000],
     ];
 
     // Convert dummy data to FlSpot format and update the state.
