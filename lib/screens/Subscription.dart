@@ -100,11 +100,24 @@ class DemoChoosePlanScreen3State extends State<DemoChoosePlanScreen3> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWidget(
-        'Subscription Plans',
-        textColor: Colors.white,
-        center: true,
-        color: Color.fromARGB(255, 218, 32, 40),
+      appBar: AppBar(
+        title: Text('Subscription Plans'),
+        centerTitle: true,
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       backgroundColor: context.scaffoldBackgroundColor,
       body: Container(

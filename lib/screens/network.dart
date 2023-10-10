@@ -7,13 +7,19 @@ import 'package:mynetwork/screens/conndevices.dart';
 import 'package:mynetwork/screens/internet.dart';
 import 'package:mynetwork/screens/router.dart';
 
+import 'Connected Device/Ethernet/showdevice.dart';
+
 class Network extends StatefulWidget {
-  final String ipAddress;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
   final String username;
   final String password;
   const Network({
     Key? key,
-    required this.ipAddress,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
     required this.username,
     required this.password,
   }) : super(key: key);
@@ -26,77 +32,135 @@ class _NetworkState extends State<Network> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(9.0),
-        child: Center(
-          child: Container(
-              width: 320,
-              height: 600,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 3),
-                borderRadius: BorderRadius.circular(10),
-                shape: BoxShape.rectangle,
-              ),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularContainer(
-                        buttonText: 'Internet',
-                        buttonIcon: Icons.signal_cellular_alt,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => InternetPage(
-                                      ipAddress: widget.ipAddress,
-                                      username: widget.username,
-                                      password: widget.password,
-                                    )),
-                          );
-                        },
+        body: Center(
+      child: Container(
+        width: 350,
+        height: 560,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 3),
+          borderRadius: BorderRadius.circular(10),
+          shape: BoxShape.rectangle,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            CircularContainer(
+              buttonText: 'Internet',
+              buttonIcon: Icons.signal_cellular_alt,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => InternetPage(
+                            ipAddresses: widget.ipAddresses,
+                            ipUsername: widget.ipUsername,
+                            ipPassword: widget.ipPassword,
+                          )),
+                );
+              },
+            ),
+            CircularContainer(
+              buttonText: 'Hardware',
+              buttonIcon: Icons.router,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RouterPage(
+                            ipAddresses: widget.ipAddresses,
+                            ipUsername: widget.ipUsername,
+                            ipPassword: widget.ipPassword,
+                            username: widget.username,
+                            password: widget.password,
+                          )),
+                );
+              },
+            ),
+            CircularContainer(
+              buttonText: 'Devices',
+              buttonIcon: Icons.devices,
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text(
+                        'Connected Devices',
+                        style: TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 20),
-                      CircularContainer(
-                        buttonText: 'Hardware',
-                        buttonIcon: Icons.router,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RouterPage(
-                                      ipAddress: widget.ipAddress,
-                                      username: widget.username,
-                                      password: widget.password,
-                                    )),
-                          );
-                        },
+                      content: Text(
+                        'Open the devices you want to View',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.w300),
+                        textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 20),
-                      CircularContainer(
-                        buttonText: 'Devices',
-                        buttonIcon: Icons.devices,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ConDevices(
-                                      ipAddress: widget.ipAddress,
-                                      username: widget.username,
-                                      password: widget.password,
-                                    )),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              )),
+                      actions: [
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton(
+                              child: const Text(
+                                'Ethernet',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w400),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ConnectedEtherDevicesPage(
+                                            ipAddresses: widget.ipAddresses,
+                                            ipUsername: widget.ipUsername,
+                                            ipPassword: widget.ipPassword,
+                                          )),
+                                );
+                              },
+                            ),
+                            TextButton(
+                              child: const Text(
+                                'Wireless',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w400),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ConDevices(
+                                            ipAddresses: widget.ipAddresses,
+                                            ipUsername: widget.ipUsername,
+                                            ipPassword: widget.ipPassword,
+                                          )),
+                                );
+                              },
+                            ),
+                            TextButton(
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w400),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -190,69 +254,3 @@ class CircularContainer extends StatelessWidget {
     );
   }
 }
-
-
-
-// Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             const Text(
-//               'Network Configuration',
-//               style: TextStyle(
-//                 fontSize: 24.0,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             const SizedBox(height: 16.0),
-//             NetworkOption(
-//               icon: Icons.signal_cellular_alt,
-//               title: 'Internet',
-//               onTap: () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                     builder: (context) => InternetPage(
-//                       ipAddress: widget.ipAddress,
-//                       username: widget.username,
-//                       password: widget.password,
-//                     ),
-//                   ),
-//                 );
-//               },
-//             ),
-//             const SizedBox(height: 8.0),
-//             NetworkOption(
-//               icon: Icons.router,
-//               title: 'Network Hardware',
-//               onTap: () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                     builder: (context) => RouterPage(
-//                       ipAddress: widget.ipAddress,
-//                       username: widget.username,
-//                       password: widget.password,
-//                     ),
-//                   ),
-//                 );
-//               },
-//             ),
-//             const SizedBox(height: 8.0),
-//             NetworkOption(
-//               icon: Icons.devices,
-//               title: 'Connected Devices',
-//               onTap: () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                     builder: (context) => ConDevices(
-//                       ipAddress: widget.ipAddress,
-//                       username: widget.username,
-//                       password: widget.password,
-//                     ),
-//                   ),
-//                 );
-//               },
-//             ),
-//           ],
-//         ),

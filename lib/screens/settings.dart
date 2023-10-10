@@ -4,12 +4,16 @@ import 'package:mynetwork/screens/apppreference.dart';
 import 'package:mynetwork/screens/legal.dart';
 
 class Settings extends StatefulWidget {
-  final String ipAddress;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
   final String username;
   final String password;
   const Settings({
     Key? key,
-    required this.ipAddress,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
     required this.username,
     required this.password,
   });
@@ -74,7 +78,11 @@ class _SettingsState extends State<Settings> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AccountSettingsPage(),
+                    builder: (context) => AccountSettingsPage(
+                      ipAddresses: widget.ipAddresses,
+                      username: widget.username,
+                      password: widget.password,
+                    ),
                   ),
                 );
               },

@@ -2,18 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mynetwork/screens/dashboard.dart';
+// import 'package:mynetwork/screens/dashboard.dart';
 import 'dart:convert';
 
 import 'package:mynetwork/screens/dashview.dart';
 
 class RouterPage extends StatefulWidget {
-  final String ipAddress;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
   final String username;
   final String password;
+
   const RouterPage({
     Key? key,
-    required this.ipAddress,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
     required this.username,
     required this.password,
   }) : super(key: key);
@@ -42,20 +47,20 @@ class _RouterPageState extends State<RouterPage> {
 
   Future<void> fetchData() async {
     final response = await http.get(
-      Uri.parse('http://${widget.ipAddress}/rest/system/resource'),
+      Uri.parse('http://${widget.ipAddresses}/rest/system/resource'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
       },
     );
 
     final response2 = await http.get(
-      Uri.parse('http://${widget.ipAddress}/rest/interface/ethernet'),
+      Uri.parse('http://${widget.ipAddresses}/rest/interface/ethernet'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
       },
     );
 
@@ -77,11 +82,11 @@ class _RouterPageState extends State<RouterPage> {
     // Make HTTP request to upgrade router OS
     final response = await http.get(
       Uri.parse(
-          'http://${widget.ipAddress}/rest/system/package/update/install'),
+          'http://${widget.ipAddresses}/rest/system/package/update/install'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
       },
     );
 
@@ -103,11 +108,11 @@ class _RouterPageState extends State<RouterPage> {
     // Make HTTP request to reboot router
     // Replace <API_ENDPOINT> with your Mikrotik API endpoint
     final response = await http.post(
-      Uri.parse('http://${widget.ipAddress}/rest/system/reboot'),
+      Uri.parse('http://${widget.ipAddresses}/rest/system/reboot'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
       },
     );
 
@@ -116,7 +121,9 @@ class _RouterPageState extends State<RouterPage> {
         context,
         MaterialPageRoute(
             builder: (context) => Dashview(
-                  ipAddress: widget.ipAddress,
+                  ipAddresses: widget.ipAddresses,
+                  ipUsername: widget.ipUsername,
+                  ipPassword: widget.ipPassword,
                   username: widget.username,
                   password: widget.password,
                 )),
@@ -413,16 +420,7 @@ class _RouterPageState extends State<RouterPage> {
                               ),
                               onPressed: () {
                                 rebootRouter();
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Dash(
-                                      ipAddress: widget.ipAddress,
-                                      username: widget.username,
-                                      password: widget.password,
-                                    ),
-                                  ),
-                                );
+                                Navigator.pop(context);
                               },
                             ),
                             SizedBox(

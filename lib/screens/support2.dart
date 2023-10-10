@@ -10,91 +10,91 @@ class SupportM extends StatefulWidget {
 }
 
 class _SupportMState extends State<SupportM> {
-  final nameController = TextEditingController();
-  final controllerTo = TextEditingController();
-  final controllerSubject = TextEditingController();
-  final controllerMessage = TextEditingController();
+  static const menuItems = <String>[
+    'Trouble Ticketing',
+    'Service Ticketing',
+    'Personal Ticketing',
+    'Others',
+  ];
+  final List<DropdownMenuItem<String>> _dropitems = menuItems
+      .map((String value) => DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          ))
+      .toList();
 
+  final name = TextEditingController();
+  final email = TextEditingController();
+  // final subject = TextEditingController();
+  final message = TextEditingController();
+  String subject1 = menuItems[0];
   final _key = GlobalKey<FormState>();
 
-  // sendEmail(String subject, String body, String recipientemail) async {
-  //   final Email email = Email(
-  //     body: body,
-  //     subject: subject,
-  //     recipients: [recipientemail],
-  //     isHTML: false,
-  //   );
-  //   await FlutterEmailSender.send(email);
-  // }
-
-  Future<void> sendEmail() async {
-    final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+  Future sendEmail() async {
     const serviceId = "service_a042gdq";
     const templateId = "template_pow7678";
     const userId = "GRE1QCwtRtq-J6quG";
+    const accessToken = "XUbQ7YLbLqv00yvUf8adB";
 
-    try {
-      final response = await http.post(url,
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            "service_id": serviceId,
-            "template_id": templateId,
-            "userId": userId,
-            "template_params": {
-              "name": nameController.text,
-              "subject": controllerSubject.text,
-              "message": controllerMessage.text,
-              "user_email": controllerTo.text
-            },
-          }));
-
-      if (response.statusCode == 200) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Email Sent'),
-              content: Text('Email sent successfully'),
-              actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
+    final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
+    final response = await http.post(url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          "service_id": serviceId,
+          "template_id": templateId,
+          "user_id": userId,
+          "accessToken": accessToken,
+          "template_params": {
+            "users_subject": subject1,
+            "users_email": email.text,
+            "users_message": message.text,
+            "users_name": name.text,
           },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Email Not Sent'),
-              content: Text(
-                  'An error occurred while sending Email. Status code: ${response.statusCode}'),
-              actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+        }));
+    if (response.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Email Sent'),
+            content: Text('Email sent successfully'),
+            actions: [
+              TextButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Colors.black, width: 3),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Email Not Sent'),
-            content: Text('An error occurred: $e'),
+            content: Text(
+                'An error occurred while sending Email. Status code: ${response.statusCode}'),
             actions: [
               TextButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Colors.black, width: 3),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -111,29 +111,63 @@ class _SupportMState extends State<SupportM> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Support'),
+        title: Text('Make Request'),
         centerTitle: true,
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Form(
           key: _key,
           child: Column(children: [
-            buildTextField(title: 'Email', controller: controllerTo),
             const SizedBox(
               height: 16,
             ),
-            buildTextField(title: 'Name', controller: nameController),
+            DropdownButtonFormField<String>(
+              value: subject1,
+              items: _dropitems,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() => subject1 = newValue);
+                }
+              },
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Subject',
+                labelStyle: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
+              ),
+            ),
             const SizedBox(
               height: 16,
             ),
-            buildTextField(title: 'Subject', controller: controllerSubject),
+            buildTextField(title: 'Your Email', controller: email),
+            const SizedBox(
+              height: 16,
+            ),
+            buildTextField(title: 'Fullname', controller: name),
             const SizedBox(
               height: 16,
             ),
             buildTextField(
               title: 'Message',
-              controller: controllerMessage,
+              controller: message,
               maxLines: 8,
             ),
             const SizedBox(
@@ -141,6 +175,7 @@ class _SupportMState extends State<SupportM> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
                 minimumSize: Size.fromHeight(50),
                 textStyle: TextStyle(fontSize: 20),
               ),
@@ -152,21 +187,6 @@ class _SupportMState extends State<SupportM> {
       ),
     );
   }
-
-  // Future launchEmail({
-  //   required String toEmail,
-  //   required String subject,
-  //   required String message,
-  // }) async {
-  //   final url =
-  //       'mailto:$toEmail?subject=${Uri.encodeFull(subject)}&body=${Uri.encodeFull(message)}';
-  //   if (await canLaunch(url)) {
-  //     await launch(url);
-  //   } else {
-  //     print(errorMessage);
-  //     print('lolo');
-  //   }
-  // }
 
   Widget buildTextField({
     required String title,

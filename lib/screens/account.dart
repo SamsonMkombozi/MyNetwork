@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mynetwork/screens/changepassword.dart';
 
 class AccountSettingsPage extends StatelessWidget {
+  final String ipAddresses;
+  final String username;
+  final String password;
+
+  const AccountSettingsPage({
+    Key? key,
+    required this.ipAddresses,
+    required this.username,
+    required this.password,
+  });
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,8 +39,16 @@ class AccountSettingsPage extends StatelessWidget {
             subtitle: Text('Change your account password'),
             leading: Icon(Icons.lock),
             onTap: () {
-              // Handle change password tap
-              // Add your logic here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PasswordChangePage(
+                    ipAddresses: ipAddresses,
+                    username: username,
+                    password: password,
+                  ),
+                ),
+              );
             },
           ),
           ListTile(

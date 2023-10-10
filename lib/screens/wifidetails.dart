@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-// import 'package:esp_smartconfig/esp_smartconfig.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
@@ -27,6 +26,9 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
   TextEditingController pwordController = TextEditingController();
   String wifiUsername = '';
   String wifiPassword = '';
+  String securityProfilePassword = '';
+  int wifiIndex = 0;
+  int securityProfileIndex = 0;
   bool isPasswordVisible = false;
   bool hasUnsavedChanges = false;
 
@@ -64,6 +66,9 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
           wifiPassword = pw[0]['wpa-pre-shared-key'].toString();
           unameController.text = wifiUsername;
           pwordController.text = wifiPassword;
+          wifiIndex = 0;
+          securityProfilePassword = pw[0]['wpa-pre-shared-key'].toString();
+          securityProfileIndex = 0;
         });
       } else {
         final snackBar = SnackBar(
@@ -82,12 +87,12 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
   Future<void> editWifiDetails(String newUsername, String newPassword) async {
     try {
       final requestBody = {
-        'numbers': 0,
+        'numbers': wifiIndex,
         'ssid': newUsername,
       };
 
       final requestBody1 = {
-        'numbers': 0,
+        'numbers': securityProfileIndex,
         'wpa-pre-shared-key': newPassword,
       };
 
@@ -102,13 +107,11 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
       );
 
       if (response.statusCode == 200) {
-        // Handle successful response for the first request
         setState(() {
           wifiUsername = newUsername;
-          hasUnsavedChanges = false; // Reset the flag after saving changes
+          hasUnsavedChanges = false;
         });
       } else {
-        // Handle error response for the first request
         final errorResponse = json.decode(response.body);
         throw Exception(
             'API Error (Change Username): ${errorResponse['message']}');
@@ -126,12 +129,12 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
       );
 
       if (response1.statusCode == 200) {
-        // Handle successful response for the second request
         setState(() {
           wifiPassword = newPassword;
+          securityProfilePassword =
+              newPassword; // Update the security profile password
         });
       } else {
-        // Handle error response for the second request
         final errorResponse1 = json.decode(response1.body);
         throw Exception(
             'API Error (Change Password): ${errorResponse1['message']}');
@@ -141,7 +144,6 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
           SnackBar(content: Text('WiFi details updated successfully!'));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } catch (error) {
-      // Handle other errors (e.g., network errors) here
       print('Error: $error');
       showDialog(
         context: context,
@@ -171,7 +173,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
         unameController.text,
         pwordController.text,
       );
-      hasUnsavedChanges = false; // Reset the flag
+      hasUnsavedChanges = false;
     }
   }
 
@@ -180,18 +182,17 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
     return Scaffold(
       appBar: AppBar(
         leading: Transform.scale(
-            scale:
-                2.5, // Adjust this value to increase or decrease the icon size
-            child: Padding(
-              padding: EdgeInsets.only(left: 13),
-              child: IconButton(
-                onPressed: () {
-                  // Handle back button press here
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(Icons.arrow_back),
-              ),
-            )),
+          scale: 2.5,
+          child: Padding(
+            padding: EdgeInsets.only(left: 13),
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.arrow_back),
+            ),
+          ),
+        ),
         toolbarHeight: 130,
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
         actions: [
@@ -205,13 +206,12 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                   color: Colors.white,
                   onSelected: (String value) {
                     if (value == 'save') {
-                      // Handle the "Save" action here
                       if (hasUnsavedChanges) {
                         editWifiDetails(
                           unameController.text,
                           pwordController.text,
                         );
-                        hasUnsavedChanges = false; // Reset the flag
+                        hasUnsavedChanges = false;
                       }
                     } else if (value == 'share') {
                       _shareQrCode();
@@ -221,8 +221,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                     return [
                       PopupMenuItem<String>(
                         value: 'save',
-                        enabled:
-                            hasUnsavedChanges, // Enable only if changes are made
+                        enabled: hasUnsavedChanges,
                         child: Center(
                           child: Text('Save'),
                         ),
@@ -376,6 +375,19 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                   SizedBox(
                     height: 15,
                   ),
+                  GestureDetector(
+                    onTap: showDetailsDialog,
+                    child: Text(
+                      'Tap to View Details',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
                   Container(
                     child: QrImageView(
                       data:
@@ -385,15 +397,6 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                       backgroundColor: Colors.white,
                     ),
                   ),
-                  // const SizedBox(
-                  //   child: Text(
-                  //     'Scan QrCode',
-                  //     style: TextStyle(
-                  //       fontWeight: FontWeight.w600,
-                  //       fontSize: 27,
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),
@@ -420,20 +423,31 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
 
     Share.shareFiles([filePath], text: 'Sharing WiFi QR code');
   }
+
+  void showDetailsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('WiFi Network Details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('WiFi Network SSID: $wifiUsername'),
+              Text('WiFi Network Password: $wifiPassword'),
+              Text('Security Profile Password: $securityProfilePassword'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
-
-// void main(List<String> arguments) async {
-//   final provisioner = Provisioner.espTouchV2();
-//   provisioner.listen((response) {
-//     print("Device $response has been connected to WiFi");
-//   });
-
-//   await provisioner.start(ProvisioningRequest.fromStrings(
-//     ssid: "",
-//     bssid: "",
-//     password: "",
-//   ));
-//   await Future.delayed(Duration(seconds: 15));
-//   provisioner.stop();
-//   exit(0);
-// }

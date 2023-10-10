@@ -3,15 +3,15 @@ import 'package:mynetwork/screens/cdevices.dart';
 import 'package:mynetwork/test/accesslist.dart';
 
 class ConDevices extends StatefulWidget {
-  final String ipAddress;
-  final String username;
-  final String password;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
 
   const ConDevices({
     Key? key,
-    required this.ipAddress,
-    required this.username,
-    required this.password,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
   }) : super(key: key);
 
   @override
@@ -45,7 +45,7 @@ class _ConDevicesState extends State<ConDevices> {
                 icon: Icon(Icons.arrow_back),
               ),
             )),
-        toolbarHeight: 130,
+        toolbarHeight: 100,
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: PageView(
@@ -57,14 +57,14 @@ class _ConDevicesState extends State<ConDevices> {
         },
         children: [
           ConnectedDevicesPage(
-            ipAddress: widget.ipAddress,
-            username: widget.username,
-            password: widget.password,
+            ipAddresses: widget.ipAddresses,
+            ipUsername: widget.ipUsername,
+            ipPassword: widget.ipPassword,
           ),
           AccessListPage(
-            ipAddress: widget.ipAddress,
-            username: widget.username,
-            password: widget.password,
+            ipAddresses: widget.ipAddresses,
+            ipUsername: widget.ipUsername,
+            ipPassword: widget.ipPassword,
           ),
         ],
       ),

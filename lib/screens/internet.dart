@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:mynetwork/screens/Activity.dart';
+import 'package:mynetwork/screens/blockedSites.dart';
 import 'package:mynetwork/screens/wifi.dart';
 // import 'package:mynetwork/test/activity.dart';
 import 'speed.dart';
 
 class InternetPage extends StatelessWidget {
-  final String ipAddress;
-  final String username;
-  final String password;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
 
   const InternetPage({
     Key? key,
-    required this.ipAddress,
-    required this.username,
-    required this.password,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
   }) : super(key: key);
 
   @override
@@ -75,9 +76,9 @@ class InternetPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => MyWifiWidget(
-                          ipAddress: ipAddress,
-                          username: username,
-                          password: password,
+                          ipAddresses: ipAddresses,
+                          ipUsername: ipUsername,
+                          ipPassword: ipPassword,
                         ),
                       ),
                     );
@@ -98,6 +99,23 @@ class InternetPage extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 RectangularContainer(
+                  buttonText: 'Block Sites',
+                  buttonIcon: Icons.web_stories,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => bsites(
+                          ipAddresses: ipAddresses,
+                          ipUsername: ipUsername,
+                          ipPassword: ipPassword,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 20),
+                RectangularContainer(
                   buttonText: 'Activity',
                   buttonIcon: Icons.bar_chart_outlined,
                   onTap: () {
@@ -105,9 +123,9 @@ class InternetPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => MikrotikChartPage(
-                          ipAddress: ipAddress,
-                          username: username,
-                          password: password,
+                          ipAddresses: ipAddresses,
+                          ipUsername: ipUsername,
+                          ipPassword: ipPassword,
                         ),
                       ),
                     );

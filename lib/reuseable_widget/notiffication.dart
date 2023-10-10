@@ -136,22 +136,20 @@ import 'package:mynetwork/screens/router.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Notiffication extends StatefulWidget {
-  final String ipAddress;
-  final String username;
-  final String password;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
 
   const Notiffication({
     Key? key,
-    required this.ipAddress,
-    required this.username,
-    required this.password,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
   }) : super(key: key);
 
   @override
   _NotifficationState createState() => _NotifficationState();
 }
-
-
 
 class _NotifficationState extends State<Notiffication> {
   @override
@@ -253,140 +251,191 @@ class _NotifficationState extends State<Notiffication> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 90),
-              child: Align(
-                alignment: AlignmentDirectional.center,
-                child: Container(
-                  width: 350,
-                  height: 630,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(width: 2),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: SingleChildScrollView(
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Notifications',
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                              ),
+                padding: EdgeInsets.only(top: 90),
+                child: Align(
+                  alignment: AlignmentDirectional.center,
+                  child: Container(
+                    width: 350,
+                    height: 630,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(width: 2),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: SingleChildScrollView(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                            Padding(
+                              padding:
+                                  EdgeInsetsDirectional.fromSTEB(0, 8, 0, 0),
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0, 1, 0, 0),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(0),
+                                        ),
+                                        child: Container(
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            color: Color.fromARGB(
+                                                255, 247, 233, 233),
+                                            borderRadius:
+                                                BorderRadius.circular(0),
+                                          ),
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    12, 12, 12, 12),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  width: 44,
+                                                  height: 44,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0x4D9489F5),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: Color(0xFF6F61EF),
+                                                      width: 2,
+                                                    ),
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                                2, 2, 2, 2),
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              40),
+                                                      child: Image.network(
+                                                        'https://source.unsplash.com/random/1280x720?user&2',
+                                                        width: 44,
+                                                        height: 44,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsetsDirectional
+                                                            .fromSTEB(
+                                                                8, 0, 0, 0),
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Habari Node',
+                                                          textAlign:
+                                                              TextAlign.start,
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Plus Jakarta Sans',
+                                                            color: Color(
+                                                                0xFF15161E),
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsetsDirectional
+                                                                  .fromSTEB(0,
+                                                                      4, 0, 0),
+                                                          child: Text(
+                                                            'We are sad to inform you that today You will be having Slow internet due to maintaince, will inform you on any update',
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  'Outfit',
+                                                              color: Color(
+                                                                  0xFF606A85),
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          0,
+                                                                          4,
+                                                                          0,
+                                                                          0),
+                                                              child: Text(
+                                                                'Mon. July 3rd - 4:12pm',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .start,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'Outfit',
+                                                                  color: Color(
+                                                                      0xFF606A85),
+                                                                  fontSize: 12,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Icon(
+                                                              Icons
+                                                                  .chevron_right_rounded,
+                                                              color: Color(
+                                                                  0xFF606A85),
+                                                              size: 24,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ]),
                             ),
-                            SizedBox(height: 8),
-                            Container(
-                              width: 180,
-                              height: 2,
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: Colors.black, width: 2),
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            RectangularContainer(
-                              buttonText: 'New Update',
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RouterPage(
-                                            ipAddress: widget.ipAddress,
-                                            username: widget.username,
-                                            password: widget.password,
-                                          )),
-                                );
-                              },
-                            ),
-                            SizedBox(height: 20),
-                            ElevatedButton(
-                                child: Text('Send'), onPressed: () {})
-                            // NotificationButton(
-                            //     text: "Normal Notification",
-                            //     onPressed: () async {
-                            //       await NotificationService.showNotification(
-                            //         title: "Title of the Notification",
-                            //         body: "Body of the Notification",
-                            //         // acTionButtons: [],
-                            //       );
-                            //     }),
-                            // NotificationButton(
-                            //     text: "Notification with Summary",
-                            //     onPressed: () async {
-                            //       await NotificationService.showNotification(
-                            //         title: "Title of the Notification",
-                            //         body: "Body of the Notification",
-                            //         summary: "small Summary",
-                            //         notificationLayout:
-                            //             NotificationLayout.Inbox,
-                            //         // acTionButtons: [],
-                            //       );
-                            //     }),
-                            // NotificationButton(
-                            //     text: "Progress Bar Notification",
-                            //     onPressed: () async {
-                            //       await NotificationService.showNotification(
-                            //         title: "Title of the Notification",
-                            //         body: "Body of the Notification",
-                            //         summary: "small Summary",
-                            //         notificationLayout:
-                            //             NotificationLayout.ProgressBar,
-                            //         // acTionButtons: [],
-                            //       );
-                            //     }),
-                            // NotificationButton(
-                            //     text: "Message Notification",
-                            //     onPressed: () async {
-                            //       await NotificationService.showNotification(
-                            //         title: "Title of the Notification",
-                            //         body: "Body of the Notification",
-                            //         summary: "small Summary",
-                            //         notificationLayout:
-                            //             NotificationLayout.Messaging,
-                            //         // acTionButtons: [],
-                            //       );
-                            //     }),
-                            // NotificationButton(
-                            //     text: "Big Image Notification",
-                            //     onPressed: () async {
-                            //       await NotificationService.showNotification(
-                            //         title: "Title of the Notification",
-                            //         body: "Body of the Notification",
-                            //         summary: "small Summary",
-                            //         notificationLayout:
-                            //             NotificationLayout.BigPicture,
-                            //         bigPicture: "",
-                            //       );
-                            //     }),
-                            // NotificationButton(
-                            //     text: "Action Button Notification",
-                            //     onPressed: () async {
-                            //       await NotificationService.showNotification(
-                            //         title: "Title of the Notification",
-                            //         body: "Body of the Notification",
-                            //         payload: {
-                            //           "navigate": "true",
-                            //         },
-                            //         acTionButtons: [
-                            //           NotificationActionButton(
-                            //             key: "check",
-                            //             label: "check it out",
-                            //             actionType: ActionType.SilentAction,
-                            //             color: Colors.green,
-                            //           )
-                            //         ],
-                            // actionButtons: [],
-                            //       );
-                            //     })
-                          ]),
+                          ])),
                     ),
                   ),
-                ),
-              ),
-            ),
+                ))
           ],
         ));
   }

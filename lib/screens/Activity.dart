@@ -3,15 +3,15 @@ import 'package:fl_chart/fl_chart.dart';
 // import 'package:mynetwork/db/employee.dart';
 
 class MikrotikChartPage extends StatefulWidget {
-  final String ipAddress;
-  final String username;
-  final String password;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
 
   const MikrotikChartPage({
     Key? key,
-    required this.ipAddress,
-    required this.username,
-    required this.password,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
   }) : super(key: key);
 
   @override

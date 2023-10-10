@@ -10,37 +10,86 @@ class RouterConnectionPage extends StatefulWidget {
 }
 
 class _RouterConnectionPageState extends State<RouterConnectionPage> {
-  TextEditingController ipAddressController = TextEditingController();
+  String ipUsername = "";
+  String ipPassword = "";
+  List<dynamic> ipAddresses = [];
+  // TextEditingController ipAddressController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  Future connectToRouter() async {
-    String ipAddress = ipAddressController.text;
+  Future<void> loginAuth() async {
     String username = usernameController.text;
     String password = passwordController.text;
     String credentials = '$username:$password';
     String encodedCredentials = base64Encode(utf8.encode(credentials));
 
-    http.post(
-      Uri.parse('http://$ipAddress/rest/login'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Basic $encodedCredentials',
-      },
-    ).then((response) async {
+    Map<String, String> body = {
+      "brand": "Mikrotik",
+      "model": "RB11",
+    };
+
+    String jsonBody = jsonEncode(body); // Encode the body as JSON
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://bwmgr-api.habari.co.tz/api/habarinodenetworkmanager/login'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic $encodedCredentials',
+        },
+        body: jsonBody,
+      );
+
       print('Response: ${response.body}');
+
       if (response.statusCode == 200) {
-        AuthProvider().login();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
+        Map<String, dynamic> responseBody = json.decode(response.body);
+
+        if (responseBody.containsKey('error') &&
+            responseBody['error'] == 'Password incorrect') {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Login Failed'),
+                content: Text('Password is incorrect'),
+                actions: [
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          setState(() {
+            ipUsername = responseBody['username'];
+            ipPassword = responseBody['password'];
+            ipAddresses = responseBody['ip_addresses'];
+          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
               builder: (context) => Dash(
-                    ipAddress: ipAddress,
-                    username: username,
-                    password: password,
-                  )),
-        );
+                ipUsername: ipUsername,
+                ipPassword: ipPassword,
+                ipAddresses: ipAddresses.join(),
+                username: username,
+                password: password,
+              ),
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Response: ${response.body}'),
+          ));
+        }
       } else {
+        print(
+            'Connection failed. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}');
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -61,7 +110,7 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
           },
         );
       }
-    }).catchError((error) {
+    } catch (error) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -79,7 +128,7 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
           );
         },
       );
-    });
+    }
   }
 
   @override
@@ -129,26 +178,6 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                           ),
                         ),
                         SizedBox(height: 24.0),
-                        TextFormField(
-                          controller: ipAddressController,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                            labelText: 'IP Address',
-                            labelStyle: TextStyle(
-                              // textAlign: TextAlign.center,
-                              color: Colors.black,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.black),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
                         SizedBox(height: 16.0),
                         TextFormField(
                           controller: usernameController,
@@ -189,7 +218,7 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                         SizedBox(height: 24.0),
                         ElevatedButton(
                           onPressed: () {
-                            connectToRouter();
+                            loginAuth();
                             // AuthProvider().login();
                           },
                           style: ElevatedButton.styleFrom(

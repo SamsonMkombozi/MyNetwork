@@ -1,18 +1,22 @@
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 
 class AccessListPage extends StatefulWidget {
   const AccessListPage({
     Key? key,
-    required this.ipAddress,
-    required this.username,
-    required this.password,
+    required this.ipAddresses,
+    required this.ipUsername,
+    required this.ipPassword,
   }) : super(key: key);
 
-  final String ipAddress;
-  final String password;
-  final String username;
+  final String ipAddresses;
+  final String ipUsername;
+  final String ipPassword;
 
   @override
   _AccessListPageState createState() => _AccessListPageState();
@@ -20,69 +24,123 @@ class AccessListPage extends StatefulWidget {
 
 class _AccessListPageState extends State<AccessListPage> {
   List<AccessListItem> accessList = [];
+  StreamController<List<AccessListItem>> _accessListStreamController =
+      StreamController<List<AccessListItem>>();
+  late Timer _timer;
+  bool _isLoading = true;
+  StreamSubscription<List<AccessListItem>>? _accessListSubscription;
 
   @override
   void initState() {
     super.initState();
-    fetchAccessList();
+    _accessListSubscription = _accessListStreamController.stream.listen((data) {
+      setState(() {
+        accessList = data;
+        _isLoading = false;
+      });
+    });
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
+      _fetchAccessList();
+    });
   }
 
-  Future<void> fetchAccessList() async {
+  @override
+  void dispose() {
+    super.dispose();
+    _accessListSubscription?.cancel();
+    _accessListStreamController.close();
+    _timer.cancel();
+  }
+
+  Future<void> _fetchAccessList() async {
     final response = await http.post(
       Uri.parse(
-          'http://${widget.ipAddress}/rest/interface/wireless/access-list/print'),
+          'http://${widget.ipAddresses}/rest/interface/wireless/access-list/print'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
       },
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body) as List<dynamic>;
-      setState(() {
-        accessList = data
-            .map((item) => AccessListItem(
-                  indexNo: item['.id'],
-                  macAddress: item['mac-address'],
-                ))
-            .toList();
-      });
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Data Fetch Failed'),
-            content: Text(
-              'Failed to fetch data. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
-            ),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
+
+      // Fetch hostnames from the lease table
+      final leaseResponse = await http.get(
+        Uri.parse('http://${widget.ipAddresses}/rest/ip/dhcp-server/lease'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
         },
       );
+
+      if (leaseResponse.statusCode == 200) {
+        final leaseData = json.decode(leaseResponse.body) as List<dynamic>;
+
+        final updatedAccessList = data.map((item) {
+          final macAddress = item['mac-address'];
+          final leaseItem = leaseData.firstWhere(
+            (lease) => lease['mac-address'] == macAddress,
+            orElse: () => null,
+          );
+
+          final hostName = leaseItem != null ? leaseItem['host-name'] : 'N/A';
+          final ipAddress = leaseItem != null ? leaseItem['address'] : 'N/A';
+
+          return AccessListItem(
+            macAddress: item['mac-address'],
+            hostName: hostName,
+            ipAddress: ipAddress,
+          );
+        }).toList();
+        
+        _accessListStreamController.add(updatedAccessList);
+      } else {
+        // Handle error
+        _handleFetchError('Lease Data Fetch Failed', leaseResponse);
+      }
+    } else {
+      // Handle error
+      _handleFetchError('Access List Fetch Failed', response);
     }
   }
 
+  void _handleFetchError(String title, http.Response response) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(
+            'Failed to fetch data. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
+          ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> deleteAccessListItem(int index) async {
-    await fetchAccessList(); // Fetch the latest data from the server
+    await _fetchAccessList(); // Fetch the latest data from the server
 
     if (index >= 0 && index < accessList.length) {
       final response = await http.post(
         Uri.parse(
-          'http://${widget.ipAddress}/rest/interface/wireless/access-list/remove',
+          'http://${widget.ipAddresses}/rest/interface/wireless/access-list/remove',
         ),
         headers: {
           'Content-Type': 'application/json',
           'Authorization':
-              'Basic ${base64Encode(utf8.encode('${widget.username}:${widget.password}'))}',
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
         },
         body: json.encode({'numbers': '$index'}),
       );
@@ -92,27 +150,31 @@ class _AccessListPageState extends State<AccessListPage> {
           accessList.removeAt(index);
         });
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Data Delete Failed'),
-              content: Text(
-                'Failed to delete data. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
-              ),
-              actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        _handleDeleteError(response);
       }
     }
+  }
+
+  void _handleDeleteError(http.Response response) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Data Delete Failed'),
+          content: Text(
+            'Failed to delete data. Error code: ${response.statusCode} .. Status: ${response.reasonPhrase}',
+          ),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -155,38 +217,67 @@ class _AccessListPageState extends State<AccessListPage> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: accessList.length,
-                  itemBuilder: (context, index) {
-                    final accessListItem = accessList[index];
-
-                    return Card(
-                      child: ListTile(
-                        title: Text(accessListItem.indexNo as String),
-                        subtitle: Text(accessListItem.macAddress),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () => deleteAccessListItem(index),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              )
+                child: _isLoading
+                    ? SpinKitPianoWave(
+                        color: Colors.black, // Customize the color
+                        size: 60.0, // Customize the size
+                      ) // Display loading indicator
+                    : _buildAccessList(), // Display access list
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _buildAccessList() {
+    if (accessList.isEmpty) {
+      return Center(
+        child: Text(
+          'No devices are blocked',
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: accessList.length,
+      itemBuilder: (context, index) {
+        final accessListItem = accessList[index];
+
+        return Card(
+          child: ListTile(
+            title: Text('${accessListItem.hostName}'),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${accessListItem.macAddress}'),
+                Text('${accessListItem.ipAddress}'),
+              ],
+            ),
+            trailing: IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => deleteAccessListItem(index),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class AccessListItem {
   final String macAddress;
-  final String indexNo;
+  final String hostName;
+  final String ipAddress;
 
   AccessListItem({
     required this.macAddress,
-    required this.indexNo,
+    required this.hostName,
+    required this.ipAddress,
   });
 }
