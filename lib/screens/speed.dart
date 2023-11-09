@@ -67,6 +67,7 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
 
   @override
   Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: Transform.scale(
@@ -86,12 +87,13 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       backgroundColor: const Color.fromARGB(255, 240, 240, 240),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(10),
         child: Align(
           alignment: AlignmentDirectional.center,
           child: Container(
-            width: 400,
-            height: 630,
+            width: _mediaQuery.size.width * 1,
+            height: _mediaQuery.size.height * 1,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),

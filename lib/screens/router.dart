@@ -1,10 +1,6 @@
-// ignore_for_file: prefer_const_constructors, avoid_print, use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// import 'package:mynetwork/screens/dashboard.dart';
 import 'dart:convert';
-
 import 'package:mynetwork/screens/dashview.dart';
 
 class RouterPage extends StatefulWidget {
@@ -22,6 +18,7 @@ class RouterPage extends StatefulWidget {
     required this.username,
     required this.password,
   }) : super(key: key);
+
   @override
   _RouterPageState createState() => _RouterPageState();
 }
@@ -31,6 +28,10 @@ class _RouterPageState extends State<RouterPage> {
   String routerOsVersion = '';
   String uploadSpeed = '';
   String downloadSpeed = '';
+  String updateStatus = '';
+  String routerUpdateVersion = '';
+  ImageProvider? _routerImageProvider;
+  bool _isFetchingImage = true;
 
   double _parseSpeed(String speed) {
     double bytes = double.tryParse(speed) ?? 0.0;
@@ -42,7 +43,8 @@ class _RouterPageState extends State<RouterPage> {
   void initState() {
     super.initState();
     fetchData();
-    upgradeRouterOs();
+    // upgradeRouterOs();
+    _fetchRouterImage(); // Add this line to fetch the router image.
   }
 
   Future<void> fetchData() async {
@@ -64,14 +66,27 @@ class _RouterPageState extends State<RouterPage> {
       },
     );
 
+    // final response3 = await http.get(
+    //   Uri.parse(
+    //       'http://${widget.ipAddresses}/rest/system/package/update/check-for-updates'),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization':
+    //         'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+    //   },
+    // );
+
     if (response.statusCode == 200 && response2.statusCode == 200) {
       final data = jsonDecode(response.body);
       final data2 = jsonDecode(response2.body);
+      // final data3 = jsonDecode(response3.body);
       setState(() {
-        routerName = data['architecture-name'];
+        routerName = data['board-name'];
         routerOsVersion = data['version'];
         downloadSpeed = _parseSpeed(data2[0]['rx-bytes']).toStringAsFixed(2);
         uploadSpeed = _parseSpeed(data2[0]['tx-bytes']).toStringAsFixed(2);
+        // updateStatus = data3['status'];
+        // routerUpdateVersion = data3['latest-version'];
       });
     } else {
       print('failed');
@@ -79,7 +94,7 @@ class _RouterPageState extends State<RouterPage> {
   }
 
   Future<void> upgradeRouterOs() async {
-    // Make HTTP request to upgrade router OS
+    // Make an HTTP request to upgrade router OS
     final response = await http.get(
       Uri.parse(
           'http://${widget.ipAddresses}/rest/system/package/update/install'),
@@ -96,17 +111,15 @@ class _RouterPageState extends State<RouterPage> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } else {
-      // final snackBar = SnackBar(
-      //     content: Text('Error: ${response.statusCode}  ${response.body}'));
-      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      print('Failed to send upgrade request');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
     }
-
     // Add any additional logic or error handling here
   }
 
   Future<void> rebootRouter() async {
-    // Make HTTP request to reboot router
-    // Replace <API_ENDPOINT> with your Mikrotik API endpoint
+    // Make an HTTP request to reboot router
     final response = await http.post(
       Uri.parse('http://${widget.ipAddresses}/rest/system/reboot'),
       headers: {
@@ -120,13 +133,14 @@ class _RouterPageState extends State<RouterPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => Dashview(
-                  ipAddresses: widget.ipAddresses,
-                  ipUsername: widget.ipUsername,
-                  ipPassword: widget.ipPassword,
-                  username: widget.username,
-                  password: widget.password,
-                )),
+          builder: (context) => Dashview(
+            ipAddresses: widget.ipAddresses,
+            ipUsername: widget.ipUsername,
+            ipPassword: widget.ipPassword,
+            username: widget.username,
+            password: widget.password,
+          ),
+        ),
       );
     } else {
       print('Failed to send reboot request');
@@ -134,6 +148,30 @@ class _RouterPageState extends State<RouterPage> {
       print('Response body: ${response.body}');
     }
     // Add any additional logic or error handling here
+  }
+
+  Future<void> _fetchRouterImage() async {
+    // Construct the URL for the router image.
+    final routerImageURL = 'https://i.mt.lv/cdn/rb_images/902_hi_res.png';
+
+    try {
+      final response = await http.get(Uri.parse(routerImageURL));
+
+      if (response.statusCode == 200) {
+        // Get the image provider for the router image.
+        final routerImageProvider = MemoryImage(response.bodyBytes);
+
+        // Set the state with the router image provider and indicate that the image has been fetched.
+        setState(() {
+          _routerImageProvider = routerImageProvider;
+          _isFetchingImage = false; // Set to false when image is fetched
+        });
+      } else {
+        print('Failed to fetch router image: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching router image: $e');
+    }
   }
 
   @override
@@ -145,332 +183,291 @@ class _RouterPageState extends State<RouterPage> {
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
         centerTitle: true,
         leading: Transform.scale(
-          scale: 2.5, // Adjust this value to increase or decrease the icon size
+          scale: 2.5,
           child: Padding(
             padding: EdgeInsets.only(left: 13),
             child: IconButton(
               onPressed: () {
-                // Handle back button press here
                 Navigator.of(context).pop();
               },
               icon: Icon(Icons.arrow_back),
             ),
           ),
         ),
-        title: Icon(
-          Icons.router_rounded,
-          size: 90,
-          color: Colors.white,
-        ),
+        // title: Icon(
+        //   Icons.router_rounded,
+        //   size: 90,
+        //   color: Colors.white,
+        // ),
       ),
       body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            width: 350.0,
-            height: 366.0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black, width: 3),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Mikrotik Router',
-                  style: TextStyle(
+        // padding: EdgeInsets.only(left: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _isFetchingImage
+                ? CircularProgressIndicator() // Display a loading indicator
+                : Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 8),
+                      borderRadius: BorderRadius.circular(7.0),
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    child: Padding(
+                      padding: EdgeInsets.all(9),
+                      child: Image(
+                        image: _routerImageProvider ??
+                            AssetImage(
+                                'assets/placeholder.png'), // Use a placeholder image if _routerImageProvider is null
+                      ),
+                    ),
+                  ),
+            Container(
+              width: 350.0,
+              height: 366.0,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black, width: 3),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Mikrotik Router',
+                    style: TextStyle(
                       color: Colors.black,
                       fontSize: 30,
-                      fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  '-$routerName-',
-                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '-$routerName-',
+                    style: TextStyle(
                       color: Colors.black,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  'RouterOS Version',
-                  style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'RouterOS Version',
+                    style: TextStyle(
                       color: Colors.black,
                       fontSize: 23,
-                      fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  '-$routerOsVersion-',
-                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '-$routerOsVersion-',
+                    style: TextStyle(
                       color: Colors.black,
                       fontSize: 22,
-                      fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(
-                  height: 23,
-                ),
-                Container(
-                    width: 300,
-                    height: 100,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 23,
+                  ),
+                  Container(
+                    width: 250,
+                    height: 50,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 240, 240, 240),
-                      shape: BoxShape
-                          .rectangle, // Set the shape to circle for IconButton with circular border
+                      shape: BoxShape.rectangle,
                       border: Border.all(
                         color: Colors.black,
                         width: 3,
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.only(top: 9),
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: 30,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.arrow_upward,
-                                  size: 35,
-                                  weight: 600,
-                                ),
-                                Text(
-                                  'Upload Speed',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Text(
-                                  ' $uploadSpeed Mbps',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              width: 40,
-                            ),
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.arrow_downward,
-                                  size: 35,
-                                  weight: 600,
-                                ),
-                                Text(
-                                  'Download Speed',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                Text(
-                                  '$downloadSpeed Mbps',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ]),
-                    )),
-                const SizedBox(
-                  height: 30,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-          height: 150,
-          color: Color.fromARGB(255, 218, 32, 40),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 100,
-                width: 120,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            'Update',
-                            style: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.center,
-                          ),
-                          content: Text(
-                            'Do You Want To update RouterOs?',
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w300),
-                            textAlign: TextAlign.center,
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text(
-                                'Yes',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              onPressed: () {
-                                upgradeRouterOs();
-                                Navigator.of(context).pop();
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //     builder: (context) => Dash(
-                                //       ipAddress: widget.ipAddress,
-                                //       username: widget.username,
-                                //       password: widget.password,
-                                //     ),
-                                //   ),
-                                // );
-                              },
-                            ),
-                            SizedBox(
-                              width: 140,
-                            ),
-                            TextButton(
-                              child: const Text(
-                                'No',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white, // Set your desired button color here
-                    onPrimary:
-                        Colors.black, // Set your desired text/icon color here
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black, width: 3),
-                      borderRadius: BorderRadius.circular(8),
+                      padding: EdgeInsets.all(9),
+                      child: Center(
+                        child: Text(
+                          updateStatus + '\n' + routerUpdateVersion,
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ),
                     ),
                   ),
-                  child: Column(
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.upgrade_rounded,
-                        size: 60,
+                      SizedBox(
+                        height: 55,
+                        width: 110,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Update',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: Text(
+                                    'Do You Want To update RouterOs?',
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text(
+                                        'Yes',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        upgradeRouterOs();
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    SizedBox(
+                                      width: 140,
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        'No',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.black,
+                            onPrimary: Colors.black87,
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black, width: 3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Upgrade',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                       ),
                       SizedBox(
-                          height:
-                              5), // You can adjust this value to control the spacing between icon and text
-                      Text(
-                        'Upgrade',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
+                        width: 55,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 55,
-              ),
-              SizedBox(
-                height: 100,
-                width: 120,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
+                      SizedBox(
+                        height: 55,
+                        width: 110,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Reboot',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: Text(
+                                    'Do You Want To Reboot Router?',
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      child: const Text(
+                                        'Yes',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        rebootRouter();
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                    SizedBox(
+                                      width: 140,
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        'No',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.black,
+                            onPrimary: Colors.black87,
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black, width: 3),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
                             'Reboot',
                             style: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.center,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
-                          content: Text(
-                            'Do You Want To Reboot Router?',
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w300),
-                            textAlign: TextAlign.center,
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text(
-                                'Yes',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              onPressed: () {
-                                rebootRouter();
-                                Navigator.pop(context);
-                              },
-                            ),
-                            SizedBox(
-                              width: 140,
-                            ),
-                            TextButton(
-                              child: const Text(
-                                'No',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white, // Set your desired button color here
-                    onPrimary:
-                        Colors.black, // Set your desired text/icon color here
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(color: Colors.black, width: 3),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.restart_alt,
-                        size: 65,
-                      ),
-                      SizedBox(
-                          height:
-                              5), // You can adjust this value to control the spacing between icon and text
-                      Text(
-                        'Reboot',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
-          )),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

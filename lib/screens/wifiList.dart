@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
-import 'package:mynetwork/screens/wifi.dart';
+import 'package:mynetwork/screens/wifidetails.dart';
 
 class WiFiListPage extends StatefulWidget {
   final String ipAddresses;
@@ -27,51 +27,48 @@ class WiFiListPage extends StatefulWidget {
 
 class _WiFiListPageState extends State<WiFiListPage> {
   List<WiFiNetwork> networks = [];
-  late StreamController<List<WiFiNetwork>> _networksStreamController;
-  late Stream<List<WiFiNetwork>> _networksStream;
   bool _isMounted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _isMounted = true;
-    _networksStreamController = StreamController<List<WiFiNetwork>>();
-    _networksStream = _networksStreamController.stream;
-
-    fetchWiFiNetworks();
-
-    Timer.periodic(Duration(seconds: 1), (_) {
-      fetchWiFiNetworks();
-    });
-  }
 
   @override
   void dispose() {
     _isMounted = false;
-    _networksStreamController.close();
     super.dispose();
   }
 
   Future<void> fetchWiFiNetworks() async {
     final response = await http.get(
-      Uri.parse('http://${widget.ipAddresses}/rest/interface/wireless'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
-      },
-    );
+        Uri.parse('http://${widget.ipAddresses}/rest/interface/wireless'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+        });
+    final securityProfilesResponse = await http.get(
+        Uri.parse(
+            'http://${widget.ipAddresses}/rest/interface/wireless/security-profiles'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+        });
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 &&
+        securityProfilesResponse.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      final updatedNetworks =
-          data.map((item) => WiFiNetwork.fromJson(item)).toList();
+      final List<dynamic> securityProfiles =
+          json.decode(securityProfilesResponse.body);
+      final updatedNetworks = data.map((item) {
+        final network = WiFiNetwork.fromJson(item);
+        network.securityProfile =
+            getSecurityProfileForNetwork(securityProfiles, network.name);
+        return network;
+      }).toList();
 
       if (_isMounted) {
         setState(() {
           networks = updatedNetworks;
+          networks = networks.reversed.toList();
         });
-        _networksStreamController.add(updatedNetworks);
       }
     } else {
       print('Response Status Code: ${response.statusCode}');
@@ -82,100 +79,138 @@ class _WiFiListPageState extends State<WiFiListPage> {
     }
   }
 
+  String getSecurityProfileForNetwork(
+      List<dynamic> securityProfiles, String networkName) {
+    final securityProfile = securityProfiles.firstWhere(
+      (profile) => profile['name'] == networkName,
+      orElse: () => null,
+    );
+    return securityProfile != null
+        ? securityProfile['wpa2-pre-shared-key']
+        : "No Security Profile";
+  }
+
   Future<void> showAddNetworkDialog(BuildContext context) async {
     final networkName = TextEditingController();
     final ssid = TextEditingController();
     final preSharedKey = TextEditingController();
 
     await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add New WiFi Network'),
-          content: Column(
-            children: <Widget>[
-              TextField(
-                controller: networkName,
-                decoration: InputDecoration(labelText: 'Network Name'),
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Add New WiFi Network'),
+            content: Container(
+              height: MediaQuery.sizeOf(context).height * 0.25,
+              child: Column(
+                children: <Widget>[
+                  TextField(
+                    controller: networkName,
+                    decoration: InputDecoration(labelText: 'Network Name'),
+                  ),
+                  TextField(
+                    controller: ssid,
+                    decoration: InputDecoration(labelText: 'SSID'),
+                  ),
+                  TextField(
+                    controller: preSharedKey,
+                    decoration:
+                        InputDecoration(labelText: 'WPA2 Pre-Shared Key'),
+                  ),
+                ],
               ),
-              TextField(
-                controller: ssid,
-                decoration: InputDecoration(labelText: 'SSID'),
-              ),
-              TextField(
-                controller: preSharedKey,
-                decoration: InputDecoration(labelText: 'WPA2 Pre-Shared Key'),
+            ),
+            actions: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      try {
+                        await addWiFiNetwork(
+                          networkName: networkName.text,
+                          ssid: ssid.text,
+                          preSharedKey: preSharedKey.text,
+                        );
+                        Navigator.of(context).pop();
+                      } catch (e) {
+                        print('Error $e');
+                      }
+                    },
+                    child: Text('Add'),
+                  ),
+                ],
               ),
             ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                try {
-                  await addWiFiNetwork(
-                    networkName: networkName.text,
-                    ssid: ssid.text,
-                    preSharedKey: preSharedKey.text,
-                  );
+          );
+        });
+  }
 
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  print('Error $e');
-                }
-              },
-              child: Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _isMounted = true;
+    fetchWiFiNetworks();
+
+    Timer.periodic(Duration(seconds: 1), (_) {
+      fetchWiFiNetworks();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    networks.sort((a, b) => a.name.compareTo(b.name));
     return Scaffold(
       appBar: AppBar(
+        leading: Transform.scale(
+            scale:
+                2.5, // Adjust this value to increase or decrease the icon size
+            child: Padding(
+              padding: EdgeInsets.only(left: 13),
+              child: IconButton(
+                onPressed: () {
+                  // Handle back button press here
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+            )),
+        toolbarHeight: 130,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
         actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              showAddNetworkDialog(context);
-            },
-          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 30),
+            // alignment: Alignment.centerLeft,
+            child: FloatingActionButton(
+              backgroundColor: Colors.white,
+              child: const Icon(
+                color: Colors.black,
+                Icons.add,
+                size: 50,
+              ),
+              onPressed: () {
+                showAddNetworkDialog(context);
+              },
+            ),
+          )
         ],
       ),
-      body: StreamBuilder<List<WiFiNetwork>>(
-        stream: _networksStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final networkList = snapshot.data;
-            return ListView.builder(
-              itemCount: networkList?.length,
-              itemBuilder: (context, index) {
-                return WiFiNetworkCard(
-                  network: networkList![index],
-                  index: index,
-                  ipAddresses: widget.ipAddresses,
-                  ipUsername: widget.ipUsername,
-                  ipPassword: widget.ipPassword,
-                );
-              },
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      body: ListView.builder(
+        itemCount: networks.length,
+        itemBuilder: (BuildContext context, int index) {
+          return WiFiNetworkCard(
+            network: networks[index],
+            index: index,
+            ipAddresses: widget.ipAddresses,
+            ipUsername: widget.ipUsername,
+            ipPassword: widget.ipPassword,
+          );
         },
       ),
     );
@@ -240,8 +275,13 @@ class _WiFiListPageState extends State<WiFiListPage> {
 class WiFiNetwork {
   final String name;
   final String ssid;
+  String securityProfile;
 
-  WiFiNetwork({required this.name, required this.ssid});
+  WiFiNetwork({
+    required this.name,
+    required this.ssid,
+    this.securityProfile = "No Security Profile",
+  });
 
   factory WiFiNetwork.fromJson(Map<String, dynamic> json) {
     return WiFiNetwork(
@@ -276,34 +316,35 @@ class _WiFiNetworkCardState extends State<WiFiNetworkCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        child: Card(
-          child: ListTile(
-            title: Text(widget.network.name + ' (${widget.index})'),
-            subtitle: Text('SSID: ${widget.network.ssid}'),
-            trailing: Switch(
-              activeColor: Colors.black,
-              onChanged: (bool value) {
-                setState(() {
-                  isEnabled = value;
-                  toggleWirelessStatus(widget.index, isEnabled);
-                });
-              },
-              value: isEnabled,
-            ),
+      child: Card(
+        child: ListTile(
+          title: Text(widget.network.name),
+          subtitle: Text(
+              'SSID: ${widget.network.ssid} \n ${widget.network.securityProfile} '),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              deleteWirelessNetworkAndSecurityProfile();
+            },
           ),
         ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MyWifiWidget(
-                ipAddresses: widget.ipAddresses,
-                ipUsername: widget.ipUsername,
-                ipPassword: widget.ipPassword,
-              ),
+      ),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyWifiWidget(
+              ipAddresses: widget.ipAddresses,
+              ipUsername: widget.ipUsername,
+              ipPassword: widget.ipPassword,
+              ssid: widget.network.ssid,
+              Profile: widget.network.securityProfile,
+              index: widget.index,
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   void toggleWirelessStatus(int index, bool isEnabled) async {
@@ -332,5 +373,45 @@ class _WiFiNetworkCardState extends State<WiFiNetworkCard> {
     } catch (e) {
       print('Error toggling wireless network status: $e');
     }
+  }
+
+  Future<void> deleteWirelessNetworkAndSecurityProfile() async {
+    // Delete the wireless network profile.
+    final wirelessNetworkRemoveResponse = await http.post(
+      Uri.parse('http://${widget.ipAddresses}/interface/wireless/remove'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+      },
+      body: json.encode({'numbers': widget.index}),
+    );
+
+    // Check the response status code.
+    if (wirelessNetworkRemoveResponse.statusCode != 200) {
+      throw Exception(
+          'Failed to delete wireless network profile: ${wirelessNetworkRemoveResponse.statusCode}');
+    }
+
+    // Delete the security profile.
+    final securityProfileRemoveResponse = await http.post(
+      Uri.parse(
+          'http://${widget.ipAddresses}/interface/wireless/security-profiles/remove'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+      },
+      body: json.encode({'numbers': widget.index}),
+    );
+
+    // Check the response status code.
+    if (securityProfileRemoveResponse.statusCode != 200) {
+      throw Exception(
+          'Failed to delete security profile: ${securityProfileRemoveResponse.statusCode}');
+    }
+
+    // Both network and security profiles have been deleted successfully.
+    return;
   }
 }

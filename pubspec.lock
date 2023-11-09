@@ -169,6 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      sha256: "417e2a6f9d83ab396ec38ff4ea5da6c254da71e4db765ad737a42af6930140b7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.3"
   equatable:
     dependency: transitive
     description:
@@ -238,14 +246,30 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_animated_icons:
+    dependency: "direct main"
+    description:
+      name: flutter_animated_icons
+      sha256: f9d8069c746b3723d7c9a70087913ddff8e44ea636b831bcccfc58082600afe9
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_email_sender:
     dependency: "direct main"
     description:
       name: flutter_email_sender
-      sha256: "52b713a67a966be4d9e6f68a323fc0a5bc2da71c567eb451af1aa90d30adbc3a"
+      sha256: "5001e9158f91a8799140fb30a11ad89cd587244f30b4f848d87085985c49b60f"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.1"
+    version: "6.0.2"
+  flutter_internet_speed_test:
+    dependency: "direct main"
+    description:
+      name: flutter_internet_speed_test
+      sha256: "73952e4db062ee2887afd6b6d0f526b7292ad288b69b40dfa443a39d39f3d32d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -286,6 +310,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0+1"
+  flutter_markdown:
+    dependency: "direct main"
+    description:
+      name: flutter_markdown
+      sha256: "8afc9a6aa6d8e8063523192ba837149dbf3d377a37c0b0fc579149a1fbd4a619"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.18"
   flutter_native_splash:
     dependency: "direct dev"
     description:
@@ -432,6 +464,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  lottie:
+    dependency: transitive
+    description:
+      name: lottie
+      sha256: "893da7a0022ec2fcaa616f34529a081f617e86cc501105b856e5a3184c58c7c2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.3"
+  markdown:
+    dependency: transitive
+    description:
+      name: markdown
+      sha256: acf35edccc0463a9d7384e437c015a3535772e09714cf60e07eeef3a15870dcd
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.1"
   matcher:
     dependency: transitive
     description:
@@ -773,6 +821,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.2"
+  tuple:
+    dependency: transitive
+    description:
+      name: tuple
+      sha256: a97ce2013f240b2f3807bcbaf218765b6f301c3eff91092bcfa23a039e7dd151
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   typed_data:
     dependency: transitive
     description:

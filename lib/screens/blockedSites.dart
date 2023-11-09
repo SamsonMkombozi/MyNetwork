@@ -89,7 +89,7 @@ class _bsitesState extends State<bsites> {
         'chain': 'forward',
         'protocol': 'tcp',
         'dst-port': '80,443',
-        'content': url,
+        'tls-host': url,
         'action': 'reject',
       }),
     );
@@ -209,6 +209,7 @@ class _bsitesState extends State<bsites> {
 
   @override
   Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: Transform.scale(
@@ -334,305 +335,284 @@ class _bsitesState extends State<bsites> {
         ],
       ),
       backgroundColor: const Color.fromARGB(255, 240, 240, 240),
-      body: Align(
-        alignment: AlignmentDirectional.center,
-        child: Container(
-          width: 400,
-          height: 630,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(width: 2),
-          ),
-          child: SingleChildScrollView(
-            // padding: const EdgeInsets.all(20),
-            child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 11, bottom: 11),
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: firewallRules.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (BuildContext context, int index) {
-                          return Card(
-                            color: Color.fromARGB(255, 240, 240, 240),
-                            elevation: 2, // Add elevation for the card shadow
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
+      body: Padding(
+        padding: EdgeInsets.all(10),
+        child: SingleChildScrollView(
+          // padding: const EdgeInsets.all(20),
+          child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 11, bottom: 11),
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: firewallRules.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return Card(
+                          color: Color.fromARGB(255, 240, 240, 240),
+                          elevation: 2, // Add elevation for the card shadow
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
 
-                            child: ListTile(
-                                // leading: Text('$index'),
-                                title: Text(firewallRules[index]),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            String editedUrl =
-                                                firewallRules[index];
-                                            return AlertDialog(
-                                              title: const Center(
-                                                child: Text('EDIT SITE URL'),
-                                              ),
-                                              content: SizedBox(
-                                                height: 60,
-                                                child: Center(
-                                                  child: TextFormField(
-                                                    keyboardType:
-                                                        TextInputType.text,
-                                                    initialValue: editedUrl,
-                                                    onChanged: (value) {
-                                                      editedUrl = value;
-                                                    },
-                                                    decoration: InputDecoration(
-                                                      labelText:
-                                                          'Enter Site URL',
-                                                      labelStyle:
-                                                          const TextStyle(
+                          child: ListTile(
+                              // leading: Text('$index'),
+                              title: Text(firewallRules[index]),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          String editedUrl =
+                                              firewallRules[index];
+                                          return AlertDialog(
+                                            title: const Center(
+                                              child: Text('EDIT SITE URL'),
+                                            ),
+                                            content: SizedBox(
+                                              height: 60,
+                                              child: Center(
+                                                child: TextFormField(
+                                                  keyboardType:
+                                                      TextInputType.text,
+                                                  initialValue: editedUrl,
+                                                  onChanged: (value) {
+                                                    editedUrl = value;
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    labelText: 'Enter Site URL',
+                                                    labelStyle: const TextStyle(
+                                                        color: Colors.black),
+                                                    focusedBorder:
+                                                        OutlineInputBorder(
+                                                      borderSide:
+                                                          const BorderSide(
                                                               color:
                                                                   Colors.black),
-                                                      focusedBorder:
-                                                          OutlineInputBorder(
-                                                        borderSide:
-                                                            const BorderSide(
-                                                                color: Colors
-                                                                    .black),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                      ),
-                                                      enabledBorder:
-                                                          OutlineInputBorder(
-                                                        borderSide:
-                                                            const BorderSide(
-                                                                color: Colors
-                                                                    .black),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    enabledBorder:
+                                                        OutlineInputBorder(
+                                                      borderSide:
+                                                          const BorderSide(
+                                                              color:
+                                                                  Colors.black),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
                                                     ),
                                                   ),
                                                 ),
                                               ),
-                                              actions: [
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 35,
-                                                              bottom: 20),
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          foregroundColor:
-                                                              Colors.black,
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            side:
-                                                                const BorderSide(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    width: 3),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                          ),
+                                            ),
+                                            actions: [
+                                              Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 35,
+                                                            bottom: 20),
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        foregroundColor:
+                                                            Colors.black,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          side:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  width: 3),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
-                                                        child: const Text(
-                                                            'CANCEL'),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
                                                       ),
+                                                      child:
+                                                          const Text('CANCEL'),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                     ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 35,
-                                                              bottom: 20),
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          foregroundColor:
-                                                              const Color
-                                                                  .fromRGBO(
-                                                                  0, 0, 0, 1),
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            side:
-                                                                const BorderSide(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    width: 3),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                          ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 35,
+                                                            bottom: 20),
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        foregroundColor:
+                                                            const Color
+                                                                .fromRGBO(
+                                                                0, 0, 0, 1),
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          side:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  width: 3),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
-                                                        child: const Text(
-                                                            'UPDATE'),
-                                                        onPressed: () async {
-                                                          await editBlockedUrl(
-                                                              index, editedUrl);
-                                                          setState(() {
-                                                            firewallRules[
-                                                                    index] =
-                                                                editedUrl;
-                                                          });
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
                                                       ),
+                                                      child:
+                                                          const Text('UPDATE'),
+                                                      onPressed: () async {
+                                                        await editBlockedUrl(
+                                                            index, editedUrl);
+                                                        setState(() {
+                                                          firewallRules[index] =
+                                                              editedUrl;
+                                                        });
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                     ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            String deleteUrl =
-                                                firewallRules[index];
-                                            return AlertDialog(
-                                              title: const Center(
-                                                child: Text('Delete SITE URL'),
+                                                  ),
+                                                ],
                                               ),
-                                              content: const SizedBox(
-                                                  height: 60,
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Are You Sure You Want Delete this site ?',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    ),
-                                                  )),
-                                              actions: [
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 35,
-                                                              bottom: 20),
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          foregroundColor:
-                                                              Colors.black,
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            side:
-                                                                const BorderSide(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    width: 3),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                          ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          String deleteUrl =
+                                              firewallRules[index];
+                                          return AlertDialog(
+                                            title: const Center(
+                                              child: Text('Delete SITE URL'),
+                                            ),
+                                            content: const SizedBox(
+                                                height: 60,
+                                                child: Center(
+                                                  child: Text(
+                                                    'Are You Sure You Want Delete this site ?',
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                )),
+                                            actions: [
+                                              Row(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 35,
+                                                            bottom: 20),
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        foregroundColor:
+                                                            Colors.black,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          side:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  width: 3),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
-                                                        child: const Text(
-                                                            'CANCEL'),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
                                                       ),
+                                                      child:
+                                                          const Text('CANCEL'),
+                                                      onPressed: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                     ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 35,
-                                                              bottom: 20),
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                          foregroundColor:
-                                                              const Color
-                                                                  .fromRGBO(
-                                                                  0, 0, 0, 1),
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            side:
-                                                                const BorderSide(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    width: 3),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                          ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 35,
+                                                            bottom: 20),
+                                                    child: ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        foregroundColor:
+                                                            const Color
+                                                                .fromRGBO(
+                                                                0, 0, 0, 1),
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          side:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .black,
+                                                                  width: 3),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
                                                         ),
-                                                        child: const Text(
-                                                            'DELETE'),
-                                                        onPressed: () async {
-                                                          // setState(() {
-                                                          //   firewallRules
-                                                          //       .removeAt(
-                                                          //           index);
-                                                          // });
+                                                      ),
+                                                      child:
+                                                          const Text('DELETE'),
+                                                      onPressed: () async {
+                                                        // setState(() {
+                                                        //   firewallRules
+                                                        //       .removeAt(
+                                                        //           index);
+                                                        // });
 
-                                                          removeBlockedUrl(
-                                                              index);
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                      ),
+                                                        removeBlockedUrl(index);
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
                                                     ),
-                                                  ],
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                )),
-                          );
-                        }),
-                  )
-                ]),
-          ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )),
+                        );
+                      }),
+                )
+              ]),
         ),
       ),
     );

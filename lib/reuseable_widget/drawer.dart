@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-// import 'package:mynetwork/db/DataTableDemo.dart';
-import 'package:mynetwork/screens/Subscription.dart';
+import 'package:mynetwork/reuseable_widget/notiffication.dart';
+import 'package:mynetwork/screens/InvoiceH.dart';
 import 'package:mynetwork/screens/auth.dart';
-import 'package:mynetwork/screens/settings.dart';
-import 'package:mynetwork/screens/support2.dart';
-import 'package:mynetwork/screens/wifiList.dart';
+import 'package:mynetwork/screens/changepassword.dart';
+import 'package:mynetwork/screens/legal.dart';
+import 'package:mynetwork/screens/support.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -45,269 +45,392 @@ class _drawpState extends State<drawp> {
 
   @override
   Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
     return Scaffold(
       body: Drawer(
+        width: _mediaQuery.size.width * 1,
         child: Container(
           color: Colors
               .white, // Set the background color of the drawer body to white
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountEmail: Text('    ' + widget.username),
-                accountName: Text(widget.ipAddresses),
-                currentAccountPicture: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    "A",
-                    style: TextStyle(fontSize: 40.0, color: Colors.black),
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 218, 32, 40),
-
-                  // Set the background color of the drawer header to black
-                ),
-              ),
-              SizedBox(
-                height: 8,
+              Container(
+                height: MediaQuery.sizeOf(context).height * 0.05,
+                color: Color.fromARGB(255, 218, 32, 40),
               ),
               Container(
-                // padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.payment,
-                    color: Colors.black,
-                    size: 40,
-                  ),
-                  title: Align(
-                    child: Text(
-                      "Subscription",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_forward,
-                    color: Colors.black,
-                    size: 40,
-                  ),
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DemoChoosePlanScreen3(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                // padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.settings,
-                    color: Colors.black,
-                    size: 40,
-                  ),
-                  title: Align(
-                    child: Text(
-                      "Settings",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_forward,
-                    color: Colors.black,
-                    size: 40,
-                  ),
-                  onTap: () {
-                    // Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Settings(
-                          ipAddresses: widget.ipAddresses,
-                          ipUsername: widget.ipUsername,
-                          ipPassword: widget.ipPassword,
-                          username: widget.username,
-                          password: widget.password,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 8,
-              ),
-              Container(
-                // padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.help_center,
-                    color: Colors.black,
-                    size: 40,
-                  ),
-                  title: Align(
-                    child: Text(
-                      "Get Help",
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  trailing: Icon(
-                    Icons.arrow_forward,
-                    color: Colors.black,
-                    size: 40,
-                  ),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            'HELP & SUPPORT',
-                            style: TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.center,
-                          ),
-                          content: Text(
-                            'You Can Contact Us for Support Or Make A Request For Your Internet Services!',
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w300),
-                            textAlign: TextAlign.center,
-                          ),
-                          actions: [
-                            Center(
-                              child: TextButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.black,
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        color: Colors.black, width: 3),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'MAKE REQUEST',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                                onPressed: () {
-                                  // Navigator.of(context).pop();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SupportM(),
+                  width: MediaQuery.sizeOf(context).width * 1,
+                  height: MediaQuery.sizeOf(context).height * 0.3,
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Card(
+                      color: Color.fromARGB(255, 218, 32, 40),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(width: 2),
+                                      color: Colors
+                                          .white, // Set the background color of the container
+                                      shape: BoxShape
+                                          .circle, // Make the container circular
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 35,
-                            ),
-                            Center(
-                              child: TextButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.black,
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        color: Colors.black, width: 3),
-                                    borderRadius: BorderRadius.circular(8),
+                                    width: 90,
+                                    height: 90,
+                                    child: Center(
+                                      child: Text(
+                                        widget.username.isNotEmpty
+                                            ? widget.username[0]
+                                            : '',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 40,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                child: const Text(
-                                  'CONTACT US',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                                onPressed: _launchWhatsApp,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(bottom: 50, right: 10),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        // Handle back button press here
+                                        Navigator.of(context).pop();
+                                      },
+                                      icon: Icon(
+                                        Icons.arrow_circle_right_outlined,
+                                        size: 55,
+                                        weight: 200,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                widget.username,
+                                style: TextStyle(
+                                    fontSize: 30.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
                               ),
                             ),
                             SizedBox(
-                              width: 5,
+                              height: 10,
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                            Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                widget.ipAddresses,
+                                style: TextStyle(
+                                    fontSize: 27.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            )
+                          ]),
+                    ),
+                  )),
+              SizedBox(
+                height: 8,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8, right: 8),
+                child: Container(
+                  // padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 2),
+                      borderRadius: BorderRadius.circular(6)),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.notifications,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    title: Align(
+                      child: Text(
+                        "Notification",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Notiffication(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
               SizedBox(
                 height: 8,
               ),
-              Container(
-                // padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1),
-                ),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.feedback_outlined,
-                    color: Colors.black,
-                    size: 40,
+              Padding(
+                padding: EdgeInsets.only(left: 8, right: 8),
+                child: Container(
+                  // padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  title: const Align(
-                      alignment: Alignment.center,
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "wifi(test)",
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.article_outlined,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    title: Align(
+                      child: Text(
+                        "Invoice",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DemoChoosePlanScreen3(),
                         ),
-                      )),
-                  trailing: Icon(
-                    Icons.arrow_forward,
-                    color: Colors.black,
-                    size: 40,
+                      );
+                    },
                   ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => WiFiListPage(
-                                ipAddresses: widget.ipAddresses,
-                                ipUsername: widget.ipUsername,
-                                ipPassword: widget.ipPassword,
-                                username: widget.username,
-                                password: widget.password,
-                              )),
-                    );
-                  },
                 ),
               ),
               SizedBox(
-                height: 200,
+                height: 8,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8, right: 8),
+                child: Container(
+                  // padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.lock,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    title: Align(
+                      child: Text(
+                        "Password",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PasswordChangePage(
+                            ipAddresses: widget.ipAddresses,
+                            username: widget.username,
+                            password: widget.password,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8, right: 8),
+                child: Container(
+                  // padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.gavel,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    title: Align(
+                      child: Text(
+                        "Legal Terms",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    onTap: () {
+                      // Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LegalPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 8, right: 8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.help_center,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    title: Align(
+                      child: Text(
+                        "Get Help",
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.black,
+                      size: 40,
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text(
+                              'HELP & SUPPORT',
+                              style: TextStyle(
+                                  fontSize: 30, fontWeight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            ),
+                            content: Text(
+                              'You Can Contact Us for Support Or Make A Request For Your Internet Services!',
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.w300),
+                              textAlign: TextAlign.center,
+                            ),
+                            actions: [
+                              Center(
+                                child: TextButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.black,
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          color: Colors.black, width: 3),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'MAKE REQUEST',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  onPressed: () {
+                                    // Navigator.of(context).pop();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SupportM1(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: 35,
+                              ),
+                              Center(
+                                child: TextButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.black,
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                          color: Colors.black, width: 3),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'CONTACT US',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  onPressed: _launchWhatsApp,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 110,
               ),
               Expanded(
                 child: Column(

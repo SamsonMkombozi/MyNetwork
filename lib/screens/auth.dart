@@ -12,10 +12,16 @@ class RouterConnectionPage extends StatefulWidget {
 class _RouterConnectionPageState extends State<RouterConnectionPage> {
   String ipUsername = "";
   String ipPassword = "";
+  String routerBrand = "";
   List<dynamic> ipAddresses = [];
   // TextEditingController ipAddressController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   Future<void> loginAuth() async {
     String username = usernameController.text;
@@ -131,6 +137,29 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
     }
   }
 
+  Future<void> fetchData() async {
+    final response = await http.get(
+      Uri.parse('http://$ipAddresses/rest/system/resource'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$ipUsername:$ipPassword'))}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      setState(() {
+        routerBrand = data['platform'];
+      });
+    } else {
+      // Print the response status code and body in case of an error
+      print('Failed to fetch data. Status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,20 +194,17 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                   child: Padding(
                     padding: EdgeInsets.all(18.0),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(height: 2.0),
                         Text(
                           'LogIn',
                           style: TextStyle(
-                            fontSize: 40.0,
+                            fontSize: 48.0,
                             fontWeight: FontWeight.w600,
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 24.0),
-                        SizedBox(height: 16.0),
                         TextFormField(
                           controller: usernameController,
                           textAlign: TextAlign.center,
@@ -196,7 +222,6 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 16.0),
                         TextFormField(
                           controller: passwordController,
                           textAlign: TextAlign.center,
@@ -215,11 +240,9 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 24.0),
                         ElevatedButton(
                           onPressed: () {
                             loginAuth();
-                            // AuthProvider().login();
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(200, 60),
@@ -237,13 +260,6 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
                                 fontWeight: FontWeight.w500),
                           ),
                         ),
-                        SizedBox(height: 24.0),
-                        // Text(
-                        //   responseMessage,
-                        //   style: TextStyle(
-                        //     color: Colors.black,
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -283,5 +299,60 @@ class AuthProvider with ChangeNotifier {
     await prefs.setBool('isLoggedIn', false);
     _isLoggedIn = false;
     notifyListeners();
+  }
+}
+
+class MyCheckBox extends State<RouterConnectionPage> {
+  bool isChecked = false;
+  void printMessage() {
+    print('user accepted the agreement');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+          padding: EdgeInsets.all(30),
+          child: Column(
+            children: [
+              Text(
+                'Read Agreement',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.teal,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                        value: isChecked,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            isChecked = newValue!;
+                          });
+                        }),
+                    Text(
+                      'I have read the agreement and i accept it',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                child: MaterialButton(
+                  onPressed: isChecked ? printMessage : null,
+                  child: Text('Confirm'),
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                ),
+              )
+            ],
+          )),
+    );
   }
 }

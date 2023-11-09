@@ -95,7 +95,7 @@ class _AccessListPageState extends State<AccessListPage> {
             ipAddress: ipAddress,
           );
         }).toList();
-        
+
         _accessListStreamController.add(updatedAccessList);
       } else {
         // Handle error
@@ -179,53 +179,53 @@ class _AccessListPageState extends State<AccessListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          width: 320,
-          height: 550,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 50,
-                child: Container(
-                  padding: EdgeInsets.only(top: 10),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.app_blocking_outlined),
-                      SizedBox(width: 10),
-                      Text(
-                        'Blocked Devices',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 25,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+    var _mediaQuery = MediaQuery.of(context);
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child: Container(
+        width: _mediaQuery.size.width * 1,
+        height: _mediaQuery.size.height * 1,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 50,
+              child: Container(
+                padding: EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black),
                   ),
                 ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.app_blocking_outlined),
+                    SizedBox(width: 10),
+                    Text(
+                      'Blocked Devices',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 25,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              Expanded(
-                child: _isLoading
-                    ? SpinKitPianoWave(
-                        color: Colors.black, // Customize the color
-                        size: 60.0, // Customize the size
-                      ) // Display loading indicator
-                    : _buildAccessList(), // Display access list
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: _isLoading
+                  ? SpinKitPianoWave(
+                      color: Colors.black, // Customize the color
+                      size: 60.0, // Customize the size
+                    ) // Display loading indicator
+                  : _buildAccessList(), // Display access list
+            ),
+          ],
         ),
       ),
     );

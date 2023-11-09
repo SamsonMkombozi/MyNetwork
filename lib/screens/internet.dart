@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynetwork/screens/Activity.dart';
 import 'package:mynetwork/screens/blockedSites.dart';
-import 'package:mynetwork/screens/wifi.dart';
+import 'package:mynetwork/screens/wifiList.dart';
 // import 'package:mynetwork/test/activity.dart';
 import 'speed.dart';
 
@@ -9,16 +9,21 @@ class InternetPage extends StatelessWidget {
   final String ipAddresses;
   final String ipUsername;
   final String ipPassword;
+  final String username;
+  final String password;
 
   const InternetPage({
     Key? key,
     required this.ipAddresses,
     required this.ipUsername,
     required this.ipPassword,
+    required this.username,
+    required this.password,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
@@ -38,10 +43,11 @@ class InternetPage extends StatelessWidget {
         toolbarHeight: 130,
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(10),
         child: Container(
-          width: 350,
-          height: 600,
+          width: _mediaQuery.size.width * 1,
+          height: _mediaQuery.size.height * 1,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.black, width: 3),
             borderRadius: BorderRadius.circular(10),
@@ -75,10 +81,12 @@ class InternetPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MyWifiWidget(
+                        builder: (context) => WiFiListPage(
                           ipAddresses: ipAddresses,
                           ipUsername: ipUsername,
                           ipPassword: ipPassword,
+                          username: username,
+                          password: password,
                         ),
                       ),
                     );
@@ -122,10 +130,12 @@ class InternetPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MikrotikChartPage(
+                        builder: (context) => ApiDataAndGraph(
                           ipAddresses: ipAddresses,
                           ipUsername: ipUsername,
                           ipPassword: ipPassword,
+                          username: username,
+                          password: password,
                         ),
                       ),
                     );

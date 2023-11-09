@@ -136,15 +136,15 @@ import 'package:mynetwork/screens/router.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Notiffication extends StatefulWidget {
-  final String ipAddresses;
-  final String ipUsername;
-  final String ipPassword;
+  // final String ipAddresses;
+  // final String ipUsername;
+  // final String ipPassword;
 
   const Notiffication({
     Key? key,
-    required this.ipAddresses,
-    required this.ipUsername,
-    required this.ipPassword,
+    // required this.ipAddresses,
+    // required this.ipUsername,
+    // required this.ipPassword,
   }) : super(key: key);
 
   @override

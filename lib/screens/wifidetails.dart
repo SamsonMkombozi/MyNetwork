@@ -9,13 +9,19 @@ class MyWifiWidget extends StatefulWidget {
   final String ipAddresses;
   final String ipUsername;
   final String ipPassword;
+  final String ssid;
+  final String Profile;
+  final int index;
 
-  const MyWifiWidget({
-    Key? key,
-    required this.ipAddresses,
-    required this.ipUsername,
-    required this.ipPassword,
-  }) : super(key: key);
+  const MyWifiWidget(
+      {Key? key,
+      required this.ipAddresses,
+      required this.ipUsername,
+      required this.ipPassword,
+      required this.ssid,
+      required this.Profile,
+      required this.index})
+      : super(key: key);
 
   @override
   _MyWifiWidgetState createState() => _MyWifiWidgetState();
@@ -31,68 +37,24 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
   int securityProfileIndex = 0;
   bool isPasswordVisible = false;
   bool hasUnsavedChanges = false;
+  bool isWifiEnabled = true;
 
   @override
   void initState() {
     super.initState();
-    fetchWifiDetails();
-  }
-
-  Future<void> fetchWifiDetails() async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://${widget.ipAddresses}/rest/interface/wireless'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization':
-              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
-        },
-      );
-      final pass = await http.get(
-        Uri.parse(
-            'http://${widget.ipAddresses}/rest/interface/wireless/security-profiles'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization':
-              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
-        },
-      );
-
-      if (response.statusCode == 200 && pass.statusCode == 200) {
-        final data = json.decode(response.body);
-        final pw = json.decode(pass.body);
-        setState(() {
-          wifiUsername = data[0]['ssid'].toString();
-          wifiPassword = pw[0]['wpa-pre-shared-key'].toString();
-          unameController.text = wifiUsername;
-          pwordController.text = wifiPassword;
-          wifiIndex = 0;
-          securityProfilePassword = pw[0]['wpa-pre-shared-key'].toString();
-          securityProfileIndex = 0;
-        });
-      } else {
-        final snackBar = SnackBar(
-          content: Text(
-            'Error: ${response.statusCode} ${response.body}',
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        print('Failed to fetch WiFi details');
-      }
-    } catch (error) {
-      print('Error: $error');
-    }
+    unameController.text = widget.ssid;
+    pwordController.text = widget.Profile;
   }
 
   Future<void> editWifiDetails(String newUsername, String newPassword) async {
     try {
       final requestBody = {
-        'numbers': wifiIndex,
+        'numbers': widget.index,
         'ssid': newUsername,
       };
 
       final requestBody1 = {
-        'numbers': securityProfileIndex,
+        'numbers': widget.index,
         'wpa-pre-shared-key': newPassword,
       };
 
@@ -131,8 +93,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
       if (response1.statusCode == 200) {
         setState(() {
           wifiPassword = newPassword;
-          securityProfilePassword =
-              newPassword; // Update the security profile password
+          securityProfilePassword = newPassword;
         });
       } else {
         final errorResponse1 = json.decode(response1.body);
@@ -205,14 +166,16 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                 child: PopupMenuButton<String>(
                   color: Colors.white,
                   onSelected: (String value) {
-                    if (value == 'save') {
-                      if (hasUnsavedChanges) {
-                        editWifiDetails(
-                          unameController.text,
-                          pwordController.text,
-                        );
-                        hasUnsavedChanges = false;
-                      }
+                    if (value == 'Enable') {
+                      setState(() {
+                        isWifiEnabled = true;
+                        toggleWirelessStatus(widget.index, isWifiEnabled);
+                      });
+                    } else if (value == 'Disable') {
+                      setState(() {
+                        isWifiEnabled = false;
+                        toggleWirelessStatus(widget.index, isWifiEnabled);
+                      });
                     } else if (value == 'share') {
                       _shareQrCode();
                     }
@@ -220,10 +183,10 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                   itemBuilder: (BuildContext context) {
                     return [
                       PopupMenuItem<String>(
-                        value: 'save',
-                        enabled: hasUnsavedChanges,
+                        value: isWifiEnabled ? 'Disable' : 'Enable',
+                        // enabled: hasUnsavedChanges,
                         child: Center(
-                          child: Text('Save'),
+                          child: Text(isWifiEnabled ? 'Disable' : 'Enable'),
                         ),
                       ),
                       PopupMenuItem<String>(
@@ -241,11 +204,11 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.only(top: 0),
+        padding: EdgeInsets.all(10),
         child: Center(
           child: Container(
-            width: 400,
-            height: 630,
+            width: MediaQuery.sizeOf(context).width * 1,
+            height: MediaQuery.sizeOf(context).height * 1,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
@@ -296,7 +259,6 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                         labelText: 'SSID',
                         labelStyle: const TextStyle(
                           color: Colors.black,
-                          decoration: TextDecoration.lineThrough,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.black, width: 3),
@@ -332,7 +294,6 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                         labelText: 'PASSWORD',
                         labelStyle: const TextStyle(
                           color: Colors.black,
-                          decoration: TextDecoration.lineThrough,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.black, width: 3),
@@ -375,19 +336,6 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                   SizedBox(
                     height: 15,
                   ),
-                  GestureDetector(
-                    onTap: showDetailsDialog,
-                    child: Text(
-                      'Tap to View Details',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
                   Container(
                     child: QrImageView(
                       data:
@@ -406,6 +354,34 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
     );
   }
 
+  void toggleWirelessStatus(int index, bool isEnabled) async {
+    final endpoint = isEnabled
+        ? '/rest/interface/wireless/enable'
+        : '/rest/interface/wireless/disable';
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://${widget.ipAddresses}$endpoint'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+        },
+        body: json.encode({'numbers': widget.index}),
+      );
+
+      if (response.statusCode == 200) {
+        print(
+            'Wireless network $index ${isEnabled ? 'enabled' : 'disabled'} successfully.');
+      } else {
+        final error = jsonDecode(response.body);
+        print('Failed to toggle wireless network status: ${error['message']}');
+      }
+    } catch (e) {
+      print('Error toggling wireless network status: $e');
+    }
+  }
+
   void _shareQrCode() async {
     final qrPainter = QrPainter(
       data: 'Username\n $wifiUsername\n and \nPassword\n $wifiPassword',
@@ -422,32 +398,5 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
     File(filePath).writeAsBytesSync(qrCodeImage!.buffer.asUint8List());
 
     Share.shareFiles([filePath], text: 'Sharing WiFi QR code');
-  }
-
-  void showDetailsDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('WiFi Network Details'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text('WiFi Network SSID: $wifiUsername'),
-              Text('WiFi Network Password: $wifiPassword'),
-              Text('Security Profile Password: $securityProfilePassword'),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

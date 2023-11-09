@@ -27,9 +27,11 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
   List<DeviceInfo> devices = [];
   StreamController<List<DeviceInfo>> _devicesStreamController =
       StreamController<List<DeviceInfo>>();
+  StreamController<List<DeviceInfo>> _dialogContentStreamController =
+      StreamController<List<DeviceInfo>>();
   late Timer _timer;
 
-  Stream<List<DeviceInfo>>? _dialogContentStream;
+  // Stream<List<DeviceInfo>>? _dialogContentStream;
 
   @override
   void initState() {
@@ -37,7 +39,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
     fetchConnectedDevices();
 
     // Set up a timer to refresh the data every 10 seconds
-    _timer = Timer.periodic(Duration(seconds: 10), (_) {
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
       if (mounted) {
         fetchConnectedDevices();
       }
@@ -48,6 +50,7 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
   void dispose() {
     super.dispose();
     _devicesStreamController.close();
+    _dialogContentStreamController.close();
     _timer.cancel();
   }
 
@@ -83,10 +86,12 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
         setState(() {
           devices = List<DeviceInfo>.from(data.map((deviceJson) {
             final macAddress = deviceJson['mac-address'];
+            final interface = deviceJson['interface'];
             return DeviceInfo.fromJson(deviceJson,
                 activeHostName: macToHostName[macAddress]);
           }));
           _devicesStreamController.add(devices);
+          _dialogContentStreamController.add(devices);
         });
       } else {
         print('Failed to fetch connected devices or DHCP leases');
@@ -206,263 +211,258 @@ class _ConnectedDevicesPageState extends State<ConnectedDevicesPage> {
     }
   }
 
+  void showCustomDialog(BuildContext context) {}
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          width: 320,
-          height: 550,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 50,
-                child: Container(
-                  padding: EdgeInsets.only(top: 10),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.devices,
-                        color: Colors.black,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        '${devices.length} Connected Devices',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 25,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+    var _mediaQuery = MediaQuery.of(context);
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child: Container(
+        width: _mediaQuery.size.width * 1,
+        height: _mediaQuery.size.height * 1,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 50,
+              child: Container(
+                padding: EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black),
                   ),
                 ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.devices,
+                      color: Colors.black,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      '${devices.length} Connected Devices',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 25,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              StreamBuilder<List<DeviceInfo>>(
-                stream: _devicesStreamController.stream,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Padding(
-                      padding: EdgeInsets.only(top: 220),
-                      child: SpinKitPianoWave(
-                        color: Colors.black,
-                        size: 60.0,
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Padding(
-                      padding: EdgeInsets.only(top: 220),
-                      child: Text(
-                        'No connected devices found.',
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                      ),
-                    );
-                  } else {
-                    final devices = snapshot.data;
+            ),
+            StreamBuilder<List<DeviceInfo>>(
+              stream: _devicesStreamController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Padding(
+                    padding: EdgeInsets.only(top: 220),
+                    child: SpinKitPianoWave(
+                      color: Colors.black,
+                      size: 60.0,
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.only(top: 220),
+                    child: Text(
+                      'No connected devices found.',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  );
+                } else {
+                  final devices = snapshot.data;
 
-                    return Expanded(
-                      child: ListView.builder(
-                        itemCount: devices!.length,
-                        itemBuilder: (context, index) {
-                          DeviceInfo device = devices[index];
-                          TextEditingController downloadController =
-                              TextEditingController(
-                                  text: device.downloadMaxLimit.toString());
-                          TextEditingController uploadController =
-                              TextEditingController(
-                                  text: device.uploadMaxLimit.toString());
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: devices!.length,
+                      itemBuilder: (context, index) {
+                        DeviceInfo device = devices[index];
+                        TextEditingController downloadController =
+                            TextEditingController(
+                                text: device.downloadMaxLimit.toString());
+                        TextEditingController uploadController =
+                            TextEditingController(
+                                text: device.uploadMaxLimit.toString());
 
-                          return GestureDetector(
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
+                        return GestureDetector(
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: ListTile(
+                              title:
+                                  Text('${device.activeHostName ?? "No Name"}'),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('MAC: ${device.macAddress}'),
+                                  Text('IP: ${device.ipAddress}'),
+                                  // Text(
+                                  //     'Data Speed: ${_extractDataUsage(device.dataUsage)}'),
+                                  Text(device.interface),
+                                ],
                               ),
-                              child: ListTile(
-                                title:
-                                    Text('${device.activeHostName ?? "N/A"}'),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('MAC: ${device.macAddress}'),
-                                    Text('IP: ${device.ipAddress}'),
-                                    Text(
-                                        'Data Usage: ${_extractDataUsage(device.dataUsage)}'),
-                                  ],
-                                ),
-                                trailing: IconButton(
-                                  icon: Icon(device.isBlocked
-                                      ? Icons.check_circle
-                                      : Icons.block),
-                                  onPressed: () {
-                                    toggleDeviceBlockStatus(device);
-                                  },
-                                ),
+                              trailing: IconButton(
+                                icon: Icon(device.isBlocked
+                                    ? Icons.check_circle
+                                    : Icons.block),
+                                onPressed: () {
+                                  toggleDeviceBlockStatus(device);
+                                },
                               ),
                             ),
-                            onTap: () {
-                              double initialDownloadLimit =
-                                  device.downloadMaxLimit;
-                              double initialUploadLimit = device.uploadMaxLimit;
-                              TextEditingController downloadController =
-                                  TextEditingController(
-                                      text: initialDownloadLimit.toString());
-                              TextEditingController uploadController =
-                                  TextEditingController(
-                                      text: initialUploadLimit.toString());
+                          ),
+                          onTap: () {
+                            double initialDownloadLimit =
+                                device.downloadMaxLimit;
+                            double initialUploadLimit = device.uploadMaxLimit;
+                            TextEditingController downloadController =
+                                TextEditingController(
+                                    text: initialDownloadLimit.toString());
+                            TextEditingController uploadController =
+                                TextEditingController(
+                                    text: initialUploadLimit.toString());
 
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Center(
-                                      child: Text(
-                                          '${device.activeHostName ?? "N/A"}'),
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Center(
+                                    child: Text(
+                                        '${device.activeHostName ?? "No name"}'),
+                                  ),
+                                  content: Container(
+                                    height:
+                                        MediaQuery.sizeOf(context).height * 0.3,
+                                    child: Column(
+                                      children: [
+                                        Text('IP: ${device.ipAddress}'),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        // Text(
+                                        //     'Data Usage: ${_extractDataUsage(device.dataUsage)}'),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        TextField(
+                                          controller: downloadController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            labelText:
+                                                'Download Max Limit (Mbps)',
+                                          ),
+                                        ),
+                                        TextField(
+                                          controller: uploadController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            labelText:
+                                                'Upload Max Limit (Mbps)',
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    content: StreamBuilder<List<DeviceInfo>>(
-                                        stream: _devicesStreamController.stream,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasData) {
-                                            return Column(
-                                              children: [
-                                                Text('IP: ${device.ipAddress}'),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                    'Data Usage: ${_extractDataUsage(device.dataUsage)}'),
-                                                SizedBox(
-                                                  height: 10,
-                                                ),
-                                                TextField(
-                                                  controller:
-                                                      downloadController,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  decoration: InputDecoration(
-                                                    labelText:
-                                                        'Download Max Limit (Mbps)',
-                                                  ),
-                                                ),
-                                                TextField(
-                                                  controller: uploadController,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  decoration: InputDecoration(
-                                                    labelText:
-                                                        'Upload Max Limit (Mbps)',
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          } else {
-                                            return Text('Stream is empty');
-                                          }
-                                        }),
-                                    actions: [
-                                      Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          TextButton(
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor: Colors.black,
-                                              backgroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                side: const BorderSide(
-                                                    color: Colors.black,
-                                                    width: 3),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
+                                  ),
+                                  actions: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        TextButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.black,
+                                                  width: 3),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            child: const Text('Cancel'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
                                           ),
-                                          TextButton(
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor: Colors.black,
-                                              backgroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                side: const BorderSide(
-                                                    color: Colors.black,
-                                                    width: 3),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
+                                          child: const Text('Cancel'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.black,
+                                                  width: 3),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            child: const Text('Set'),
-                                            onPressed: () {
-                                              double downloadLimit =
-                                                  double.tryParse(
-                                                          downloadController
-                                                              .text) ??
-                                                      0.0;
-                                              double uploadLimit =
-                                                  double.tryParse(
-                                                          uploadController
-                                                              .text) ??
-                                                      0.0;
-                                              setMaxLimitsForIPAddress(
-                                                  device.ipAddress,
-                                                  downloadLimit,
-                                                  uploadLimit);
-                                              Navigator.of(context).pop();
-                                            },
                                           ),
-                                          TextButton(
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor: Colors.black,
-                                              backgroundColor: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                side: const BorderSide(
-                                                    color: Colors.black,
-                                                    width: 3),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
+                                          child: const Text('Set'),
+                                          onPressed: () {
+                                            double downloadLimit =
+                                                double.tryParse(
+                                                        downloadController
+                                                            .text) ??
+                                                    0.0;
+                                            double uploadLimit =
+                                                double.tryParse(uploadController
+                                                        .text) ??
+                                                    0.0;
+                                            setMaxLimitsForIPAddress(
+                                                device.ipAddress,
+                                                downloadLimit,
+                                                uploadLimit);
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          style: ElevatedButton.styleFrom(
+                                            foregroundColor: Colors.black,
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                  color: Colors.black,
+                                                  width: 3),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            child: const Text('Reset'),
-                                            onPressed: () {
-                                              downloadController.text =
-                                                  initialDownloadLimit
-                                                      .toString();
-                                              uploadController.text =
-                                                  initialUploadLimit.toString();
-                                            },
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+                                          child: const Text('Reset'),
+                                          onPressed: () {
+                                            downloadController.text =
+                                                initialDownloadLimit.toString();
+                                            uploadController.text =
+                                                initialUploadLimit.toString();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -475,6 +475,7 @@ class DeviceInfo {
   final String macAddress;
   final String ipAddress;
   final String dataUsage;
+  final String interface;
   bool isBlocked;
   final String? activeHostName;
   double downloadMaxLimit;
@@ -486,6 +487,7 @@ class DeviceInfo {
     required this.macAddress,
     required this.ipAddress,
     required this.dataUsage,
+    required this.interface,
     this.isBlocked = false,
     this.activeHostName,
     this.downloadMaxLimit = 0.0,
@@ -498,6 +500,7 @@ class DeviceInfo {
       id: json['.id'],
       name: json['.id'],
       macAddress: json['mac-address'],
+      interface: json['interface'],
       ipAddress: json['last-ip'],
       dataUsage: json['rx-rate'],
       activeHostName: activeHostName,

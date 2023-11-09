@@ -31,11 +31,12 @@ class Network extends StatefulWidget {
 class _NetworkState extends State<Network> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
+    var _mediaQuery = MediaQuery.of(context);
+    return Padding(
+      padding: EdgeInsets.all(10),
       child: Container(
-        width: 350,
-        height: 560,
+        width: _mediaQuery.size.width * 1,
+        height: _mediaQuery.size.height * 1,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black, width: 3),
           borderRadius: BorderRadius.circular(10),
@@ -56,6 +57,8 @@ class _NetworkState extends State<Network> {
                             ipAddresses: widget.ipAddresses,
                             ipUsername: widget.ipUsername,
                             ipPassword: widget.ipPassword,
+                            username: widget.username,
+                            password: widget.password,
                           )),
                 );
               },
@@ -160,7 +163,7 @@ class _NetworkState extends State<Network> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
 

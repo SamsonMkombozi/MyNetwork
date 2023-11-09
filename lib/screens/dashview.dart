@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class NetworkInfo {
   NetworkInfo({required this.title, required this.icon, required this.command});
@@ -54,14 +53,14 @@ class _DashviewState extends State<Dashview> {
 
   List<NetworkInfo> networkInfoList = [
     NetworkInfo(
-      title: 'Bandwidth Usage',
-      icon: Icons.network_check,
-      command: '/interface/ethernet',
-    ),
-    NetworkInfo(
       title: 'Connected Devices',
       icon: Icons.devices,
       command: '/interface/wireless/registration-table',
+    ),
+    NetworkInfo(
+      title: 'Bandwidth Usage',
+      icon: Icons.network_check,
+      command: '/interface/ethernet',
     ),
     NetworkInfo(
       title: 'CPU Load',
@@ -273,8 +272,10 @@ class _DashviewState extends State<Dashview> {
 
   @override
   Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
     return Container(
-      height: 650,
+      width: _mediaQuery.size.width * 1,
+      height: _mediaQuery.size.height * 1,
       child: Card(
         shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.black, width: 3),
@@ -282,7 +283,7 @@ class _DashviewState extends State<Dashview> {
         ),
         margin: const EdgeInsets.all(9.0),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -299,67 +300,68 @@ class _DashviewState extends State<Dashview> {
               StreamBuilder<Map<String, String>>(
                 stream: networkDataStream,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SpinKitPouringHourGlass(
-                          color: Colors.black, // Customize the color
-                          size: 60.0, // Customize the size
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'LOADING',
-                          style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return Column(
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FloatingActionButton(
-                              backgroundColor: Colors.black,
-                              onPressed: _previousItem,
-                              child: Icon(Icons.arrow_back),
-                            ),
-                            SizedBox(width: 10),
-                            NetworkItem(
-                              icon: networkInfoList[currentIndex].icon,
-                              title: networkInfoList[currentIndex].title,
-                              response: snapshot.data?[
-                                      networkInfoList[currentIndex].title] ??
-                                  'Loading...',
-                            ),
-                            SizedBox(width: 10),
-                            FloatingActionButton(
-                              backgroundColor: Colors.black,
-                              onPressed: _nextItem,
-                              child: Icon(Icons.arrow_forward),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FloatingActionButton(
+                        backgroundColor: Colors.black,
+                        onPressed: _previousItem,
+                        child: Icon(Icons.arrow_back),
+                      ),
+                      SizedBox(width: 10),
+                      NetworkItem(
+                        icon: networkInfoList[currentIndex].icon,
+                        title: networkInfoList[currentIndex].title,
+                        response: snapshot
+                                .data?[networkInfoList[currentIndex].title] ??
+                            'Loading...',
+                      ),
+                      SizedBox(width: 10),
+                      FloatingActionButton(
+                        backgroundColor: Colors.black,
+                        onPressed: _nextItem,
+                        child: Icon(Icons.arrow_forward),
+                      ),
+                    ],
+                  );
+                  // if (snapshot.connectionState == ConnectionState.waiting) {
+                  //   return Column(
+                  //     mainAxisSize: MainAxisSize.max,
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     crossAxisAlignment: CrossAxisAlignment.center,
+                  //     children: [
+                  //       SpinKitPouringHourGlass(
+                  //         color: Colors.black, // Customize the color
+                  //         size: 60.0, // Customize the size
+                  //       ),
+                  //       SizedBox(height: 10),
+                  //       Text(
+                  //         'LOADING',
+                  //         style: TextStyle(
+                  //             fontSize: 30, fontWeight: FontWeight.w400),
+                  //       ),
+                  //     ],
+                  //   );
+                  // } else if (snapshot.hasError) {
+                  //   return Text('Error: ${snapshot.error}');
+                  // } else {
+                  //   return Column(
+                  //     children: [
+
+                  //     ],
+                  //   );
+                  // }
                 },
               ),
               SizedBox(
                 height: 9,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Weekly Data Usage',
+                    'Weekly Data Usage (GB)',
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
@@ -392,104 +394,10 @@ class _DashviewState extends State<Dashview> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   child: BarChartWidget(barData: barData),
                 ),
               ),
-
-              // Expanded(
-              //   child: Card(
-              //     elevation: 4,
-              //     shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(32)),
-              //     color: const Color(0xff020227),
-              //     child: Padding(
-              //       padding: const EdgeInsets.all(8),
-              //       child: BarChartWidget(barData: barData),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(height: 16.0),
-              // ElevatedButton(
-              //   style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-              //   onPressed: () {
-              //     showDialog(
-              //       context: context,
-              //       builder: (BuildContext context) {
-              //         return AlertDialog(
-              //           title: const Text(
-              //             'Reboot',
-              //             style: TextStyle(
-              //                 fontSize: 30, fontWeight: FontWeight.w600),
-              //             textAlign: TextAlign.center,
-              //           ),
-              //           content: Text(
-              //             'Do You Want To Reboot Router?',
-              //             style: TextStyle(
-              //                 fontSize: 25, fontWeight: FontWeight.w300),
-              //             textAlign: TextAlign.center,
-              //           ),
-              //           actions: [
-              //             Row(
-              //               mainAxisSize: MainAxisSize.max,
-              //               crossAxisAlignment: CrossAxisAlignment.center,
-              //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //               children: [
-              //                 TextButton(
-              //                   style: TextButton.styleFrom(
-              //                     foregroundColor:
-              //                         const Color.fromRGBO(0, 0, 0, 1),
-              //                     backgroundColor: Colors.white,
-              //                     shape: RoundedRectangleBorder(
-              //                       side: const BorderSide(
-              //                           color: Colors.black, width: 3),
-              //                       borderRadius: BorderRadius.circular(8),
-              //                     ),
-              //                   ),
-              //                   child: const Text(
-              //                     'Yes',
-              //                     style: TextStyle(
-              //                         fontSize: 20,
-              //                         fontWeight: FontWeight.w400),
-              //                   ),
-              //                   onPressed: () {
-              //                     rebootRouter();
-              //                     Navigator.of(context).pop();
-              //                   },
-              //                 ),
-              //                 TextButton(
-              //                   style: TextButton.styleFrom(
-              //                     foregroundColor:
-              //                         const Color.fromRGBO(0, 0, 0, 1),
-              //                     backgroundColor: Colors.white,
-              //                     shape: RoundedRectangleBorder(
-              //                       side: const BorderSide(
-              //                           color: Colors.black, width: 3),
-              //                       borderRadius: BorderRadius.circular(8),
-              //                     ),
-              //                   ),
-              //                   child: const Text(
-              //                     'No',
-              //                     style: TextStyle(
-              //                         fontSize: 20,
-              //                         fontWeight: FontWeight.w400),
-              //                   ),
-              //                   onPressed: () {
-              //                     Navigator.of(context).pop();
-              //                   },
-              //                 ),
-              //               ],
-              //             )
-              //           ],
-              //         );
-              //       },
-              //     );
-              //   },
-              //   child: const Text(
-              //     'Reboot',
-              //     style: TextStyle(fontSize: 20),
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -561,8 +469,8 @@ class BarChartWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BarChart(BarChartData(
       alignment: BarChartAlignment.end,
-      maxY: 20,
-      groupsSpace: 28,
+      maxY: 2,
+      groupsSpace: MediaQuery.of(context).size.width * 0.085,
       barTouchData: BarTouchData(enabled: true),
       titlesData: FlTitlesData(
         topTitles: AxisTitles(
@@ -578,11 +486,11 @@ class BarChartWidget extends StatelessWidget {
           drawBelowEverything: false,
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 5,
+            interval: 0.5,
             getTitlesWidget: (double value, TitleMeta meta) {
-              if (value % 5 == 0) {
+              if (value % 1 == 0) {
                 return Text(
-                  '${value.toInt()}\nGb',
+                  '${value.toInt()}\n',
                   style: TextStyle(color: Colors.black),
                 );
               }
@@ -608,7 +516,7 @@ class BarChartWidget extends StatelessWidget {
           ),
         ),
       ),
-      borderData: FlBorderData(show: true),
+      borderData: FlBorderData(show: false),
       gridData: FlGridData(show: true),
       barGroups: barData
           .map(

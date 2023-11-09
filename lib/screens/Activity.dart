@@ -1,105 +1,103 @@
-import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
-// import 'package:mynetwork/db/employee.dart';
+import 'dart:convert';
+import 'package:intl/intl.dart';
 
-class MikrotikChartPage extends StatefulWidget {
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class ApiDataAndGraph extends StatefulWidget {
   final String ipAddresses;
   final String ipUsername;
   final String ipPassword;
+  final String username;
+  final String password;
 
-  const MikrotikChartPage({
+  const ApiDataAndGraph({
     Key? key,
     required this.ipAddresses,
     required this.ipUsername,
     required this.ipPassword,
+    required this.username,
+    required this.password,
   }) : super(key: key);
 
   @override
-  _MikrotikChartPageState createState() => _MikrotikChartPageState();
+  _ApiDataAndGraphState createState() => _ApiDataAndGraphState();
 }
 
-class _MikrotikChartPageState extends State<MikrotikChartPage> {
-  List<List<FlSpot>> _chartData = [];
-  int _selectedTabIndex = 0;
-  // var db = new Mysql();
-  // var mail = '';
+class _ApiDataAndGraphState extends State<ApiDataAndGraph> {
+  Map<String, dynamic> data = {};
+  List<Data> barData = [];
+  int barInterval = 5;
 
   @override
   void initState() {
     super.initState();
-    // Fetch data for the initial tab (Day)
-    _fetchDataForTab(0);
+    fetchData();
   }
 
-  Widget _buildChart(int index) {
-    if (_chartData.isEmpty || index >= _chartData.length) {
-      return Center(child: CircularProgressIndicator());
+  Future<void> fetchData() async {
+    String credentials = '${widget.username}:${widget.password}';
+    String encodedCredentials = base64Encode(utf8.encode(credentials));
+    try {
+      Map<String, String> body = {
+        "ip_address": "${widget.ipAddresses}",
+      };
+
+      String jsonBody = jsonEncode(body);
+      final response = await http.post(
+        Uri.parse(
+            'https://bwmgr-api.habari.co.tz/api/habarinodenetworkmanager/weeklyUtilisation'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic $encodedCredentials',
+        },
+        body: jsonBody,
+      );
+
+      if (response.statusCode == 200) {
+        final decodedData = jsonDecode(response.body);
+        setState(() {
+          data = decodedData;
+          barData = updateBarData(decodedData);
+        });
+      } else {
+        print('Failed with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
     }
-
-    return Container(
-      color: Colors.white,
-      height: 200,
-      width: 400,
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(show: true),
-          titlesData: FlTitlesData(show: true),
-          borderData: FlBorderData(show: true),
-          lineBarsData: [
-            LineChartBarData(
-              spots: _chartData[index],
-              isCurved: true,
-              dotData: FlDotData(show: false),
-              belowBarData: BarAreaData(show: false),
-              color: Colors.black,
-              isStrokeCapRound: true,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
-  void _onTabSelected(int index) {
-    setState(() {
-      _selectedTabIndex = index;
-    });
+  List<Data> updateBarData(Map<String, dynamic> apiData) {
+    List<Data> barData = [];
+    int id = 0;
+    final dateFormat = DateFormat('dd/MM');
 
-    // Fetch data for the selected tab
-    _fetchDataForTab(index);
-  }
+    for (var date in apiData.keys) {
+      double download = apiData[date]['download'].toDouble();
+      double upload = apiData[date]['upload'].toDouble();
+      String formattedDate = dateFormat.format(DateTime.parse(date));
 
-  Future<void> _fetchDataForTab(int index) async {
-    // Replace the following logic with actual API calls to fetch data for each timeline.
-    // Use 'widget.ipAddress', 'widget.username', and 'widget.password' for API authentication.
-    // You can use any HTTP library (e.g., http package) to make API requests.
+      Color downloadColor = Colors.amber;
+      Color uploadColor = Colors.blue;
 
-    // Dummy data for the line chart for different timelines.
-    List<List<double>> dummyData = [
-      // Day
-      [0, 1000, 2000, 3000, 2500, 1500, 5000],
-      // Week
-      [0, 2000, 1500, 1000, 3500, 3000, 2000],
-      // Month
-      [0, 2500, 3000, 2000, 3500, 4500, 5000],
-      // Year
-      [0, 1500, 1000, 2500, 2000, 3500, 3000],
-    ];
-
-    // Convert dummy data to FlSpot format and update the state.
-    setState(() {
-      _chartData = dummyData
-          .map((data) => data
-              .asMap()
-              .entries
-              .map((entry) => FlSpot(entry.key.toDouble(), entry.value))
-              .toList())
-          .toList();
-    });
+      barData.add(Data(
+        id: id,
+        name: formattedDate,
+        y: download,
+        y2: upload,
+        color: downloadColor,
+        color2: uploadColor, // You can set different colors here
+      ));
+      id++;
+    }
+    return barData;
   }
 
   @override
   Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: Transform.scale(
@@ -119,53 +117,170 @@ class _MikrotikChartPageState extends State<MikrotikChartPage> {
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
       ),
       body: Column(
-        children: [
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
           Expanded(
-            child: _buildChart(_selectedTabIndex),
-          ),
-          Container(
-            color: Color.fromARGB(255, 218, 32, 40),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildTabItem('Day', 0),
-                _buildTabItem('Week', 1),
-                _buildTabItem('Month', 2),
-                _buildTabItem('Year', 3),
-              ],
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32)),
+              color: const Color(0xff020227),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          'Weekly Data Usage (GB)',
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Chip(
+                          label: Text(
+                            'Download',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          backgroundColor: Colors.amber,
+                        ),
+                        Chip(
+                          label: Text(
+                            'Upload',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          backgroundColor: Colors.blue,
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(22),
+                      child: Container(
+                        width: _mediaQuery.size.width * 0.9,
+                        height: _mediaQuery.size.height * 0.6,
+                        child: BarChartWidget(barData: barData),
+                      ),
+                    ),
+                  ]),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildTabItem(String label, int index) {
-    return InkWell(
-      onTap: () {
-        _onTabSelected(index);
-      },
-      child: Container(
-        height: 100,
-        padding: EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: index == _selectedTabIndex
-                  ? Colors.white
-                  : Color.fromARGB(255, 218, 32, 40),
-              width: 2.0,
-            ),
+class BarChartWidget extends StatelessWidget {
+  final List<Data> barData;
+
+  BarChartWidget({required this.barData});
+
+  @override
+  Widget build(BuildContext context) {
+    var _mediaQuery = MediaQuery.of(context);
+    return BarChart(BarChartData(
+      alignment: BarChartAlignment.end,
+      maxY: 2,
+      groupsSpace: _mediaQuery.size.width * 0.085,
+      barTouchData: BarTouchData(enabled: true),
+      titlesData: FlTitlesData(
+        topTitles: AxisTitles(
+            sideTitles: SideTitles(
+          showTitles: false,
+        )),
+        rightTitles: AxisTitles(
+            sideTitles: SideTitles(
+          showTitles: false,
+        )),
+        leftTitles: AxisTitles(
+          drawBelowEverything: true,
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 2, 
+            getTitlesWidget: (double value, TitleMeta meta) {
+              if (value % 2 == 0) {
+                return Text(
+                  '${value.toInt()}',
+                  style: TextStyle(color: Colors.white),
+                );
+              }
+              return Text('');
+            },
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: index == _selectedTabIndex ? Colors.white : Colors.grey,
-            fontSize: 16,
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: (double id, TitleMeta meta) {
+              if (id < 0 || id >= barData.length) {
+                return Text('');
+              }
+              final data = barData[id.toInt()];
+              return RotatedBox(
+                  quarterTurns: 4,
+                  child: Text(
+                    data.name,
+                    style: TextStyle(color: Colors.white),
+                  ));
+            },
           ),
         ),
       ),
-    );
+      borderData: FlBorderData(show: true),
+      gridData: FlGridData(show: true),
+      barGroups: barData
+          .map(
+            (data) => BarChartGroupData(x: data.id, barsSpace: 2, barRods: [
+              BarChartRodData(
+                toY: data.y,
+                width: 7,
+                color: data.color,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(6),
+                  topRight: Radius.circular(6),
+                ),
+              ),
+              BarChartRodData(
+                toY: data.y2,
+                width: 7,
+                color: data.color2,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(6),
+                  topRight: Radius.circular(6),
+                ),
+              ),
+            ]),
+          )
+          .toList(),
+    ));
   }
+}
+
+class Data {
+  final int id;
+  final String name;
+  final double y;
+  final double y2;
+  final Color color;
+  final Color color2;
+
+  Data({
+    required this.id,
+    required this.name,
+    required this.y,
+    required this.y2,
+    required this.color,
+    required this.color2,
+  });
 }
