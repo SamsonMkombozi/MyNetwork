@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mynetwork/screens/dashboard.dart';
 import 'dart:convert';
 import 'package:mynetwork/screens/dashview.dart';
 
@@ -66,27 +67,28 @@ class _RouterPageState extends State<RouterPage> {
       },
     );
 
-    // final response3 = await http.get(
-    //   Uri.parse(
-    //       'http://${widget.ipAddresses}/rest/system/package/update/check-for-updates'),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization':
-    //         'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
-    //   },
-    // );
+    final response3 = await http.get(
+      Uri.parse('http://${widget.ipAddresses}/rest/system/package/update'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+      },
+    );
 
-    if (response.statusCode == 200 && response2.statusCode == 200) {
+    if (response.statusCode == 200 &&
+        response2.statusCode == 200 &&
+        response3.statusCode == 200) {
       final data = jsonDecode(response.body);
       final data2 = jsonDecode(response2.body);
-      // final data3 = jsonDecode(response3.body);
+      final data3 = jsonDecode(response3.body);
       setState(() {
         routerName = data['board-name'];
         routerOsVersion = data['version'];
         downloadSpeed = _parseSpeed(data2[0]['rx-bytes']).toStringAsFixed(2);
         uploadSpeed = _parseSpeed(data2[0]['tx-bytes']).toStringAsFixed(2);
-        // updateStatus = data3['status'];
-        // routerUpdateVersion = data3['latest-version'];
+        updateStatus = data3['status'];
+        routerUpdateVersion = data3['latest-version'];
       });
     } else {
       print('failed');
@@ -95,7 +97,7 @@ class _RouterPageState extends State<RouterPage> {
 
   Future<void> upgradeRouterOs() async {
     // Make an HTTP request to upgrade router OS
-    final response = await http.get(
+    final response = await http.post(
       Uri.parse(
           'http://${widget.ipAddresses}/rest/system/package/update/install'),
       headers: {
@@ -106,10 +108,37 @@ class _RouterPageState extends State<RouterPage> {
     );
 
     if (response.statusCode == 200) {
-      setState(() {
-        final snackBar = SnackBar(content: Text('Router upgrade Success'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Dash(
+            ipAddresses: widget.ipAddresses,
+            ipUsername: widget.ipUsername,
+            ipPassword: widget.ipPassword,
+            username: widget.username,
+            password: widget.password,
+          ),
+        ),
+      );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Router Upgrade Succesfully'),
+            content: Text(
+              'Wait for Some Few Seconds',
+            ),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     } else {
       print('Failed to send upgrade request');
       print('Response status code: ${response.statusCode}');
@@ -133,7 +162,7 @@ class _RouterPageState extends State<RouterPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Dashview(
+          builder: (context) => Dash(
             ipAddresses: widget.ipAddresses,
             ipUsername: widget.ipUsername,
             ipPassword: widget.ipPassword,
@@ -141,6 +170,25 @@ class _RouterPageState extends State<RouterPage> {
             password: widget.password,
           ),
         ),
+      );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Router Reboot Succesfully'),
+            content: Text(
+              'Wait for Some Few Seconds',
+            ),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
     } else {
       print('Failed to send reboot request');
@@ -206,24 +254,18 @@ class _RouterPageState extends State<RouterPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _isFetchingImage
-                ? CircularProgressIndicator() // Display a loading indicator
-                : Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 8),
-                      borderRadius: BorderRadius.circular(7.0),
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    child: Padding(
-                      padding: EdgeInsets.all(9),
-                      child: Image(
-                        image: _routerImageProvider ??
-                            AssetImage(
-                                'assets/placeholder.png'), // Use a placeholder image if _routerImageProvider is null
-                      ),
-                    ),
-                  ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(width: 8),
+                borderRadius: BorderRadius.circular(7.0),
+              ),
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: MediaQuery.of(context).size.height * 0.2,
+              child: Padding(
+                padding: EdgeInsets.all(9),
+                child: Image.asset('lib/Assets/R1.png', fit: BoxFit.cover),
+              ),
+            ),
             Container(
               width: 350.0,
               height: 366.0,
@@ -278,7 +320,7 @@ class _RouterPageState extends State<RouterPage> {
                   ),
                   Container(
                     width: 250,
-                    height: 50,
+                    height: 70,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 240, 240, 240),
                       shape: BoxShape.rectangle,
@@ -290,9 +332,35 @@ class _RouterPageState extends State<RouterPage> {
                     child: Padding(
                       padding: EdgeInsets.all(9),
                       child: Center(
-                        child: Text(
-                          updateStatus + '\n' + routerUpdateVersion,
-                          style: TextStyle(color: Colors.green),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            updateStatus.isNotEmpty
+                                ? Text(
+                                    updateStatus,
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.green),
+                                  )
+                                : Text(
+                                    'No Updates available',
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors
+                                            .red), // Change color or style as needed
+                                  ),
+                            updateStatus.isNotEmpty
+                                ? Text(
+                                    routerUpdateVersion,
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.green),
+                                  )
+                                : SizedBox(), // You can also choose to display nothing for routerUpdateVersion
+                          ],
                         ),
                       ),
                     ),

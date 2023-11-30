@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mynetwork/drawer/billing/invoice.dart';
+import 'package:mynetwork/drawer/billing/reciepts.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class DemoChoosePlanScreen3 extends StatefulWidget {
   @override
@@ -8,108 +11,152 @@ class DemoChoosePlanScreen3 extends StatefulWidget {
 }
 
 class DemoChoosePlanScreen3State extends State<DemoChoosePlanScreen3> {
+  CarouselController buttonCarouselController = CarouselController();
+  int currentPageIndex = 0;
+  List<Widget> pages = [
+    invoice(),
+    Reciept(),
+  ];
+
+  // Text(currentPageIndex == 0 ? 'Invoice' : 'Receipts'),
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Invoice'),
-          centerTitle: true,
-          leading: Transform.scale(
-              scale:
-                  2.5, // Adjust this value to increase or decrease the icon size
-              child: Padding(
-                padding: EdgeInsets.only(left: 13),
-                child: IconButton(
-                  onPressed: () {
-                    // Handle back button press here
-                    Navigator.of(context).pop();
-                  },
-                  icon: Icon(Icons.arrow_back),
-                ),
-              )),
-          toolbarHeight: 130,
-          backgroundColor: Color.fromARGB(255, 218, 32, 40),
+      appBar: AppBar(
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('BALANCE'),
+            Text('-105 USD-'),
+          ],
+        ), 
+        centerTitle: true,
+        leading: Transform.scale(
+          scale: 2.5,
+          child: Padding(
+            padding: EdgeInsets.only(left: 13),
+            child: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: Icon(Icons.arrow_back),
+            ),
+          ),
         ),
-        backgroundColor: context.scaffoldBackgroundColor,
-        body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    color: Color.fromARGB(255, 70, 71, 77),
-                    child: Container(
-                      width: MediaQuery.sizeOf(context).width * 0.9,
-                      height: MediaQuery.sizeOf(context).height * 0.2,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(left: 15),
-                                child: Text(
-                                  '18/10/2023',
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                ),
-                              ),
-                              Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    child: FloatingActionButton(
-                                      backgroundColor: Colors.white,
-                                      child: const Icon(
-                                        weight: 600,
-                                        color: Colors.black,
-                                        Icons.arrow_downward_rounded,
-                                        size: 26,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  )),
-                            ],
-                          ),
-                          Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  'Payment Invoice',
-                                  style: TextStyle(
-                                      fontSize: 23.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                ),
-                              )),
-                          Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Text(
-                                  '120 USD',
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white),
-                                ),
-                              )),
-                          SizedBox(
-                            height: 15,
-                          )
-                        ],
+        toolbarHeight: 100,
+        backgroundColor: Color.fromARGB(255, 218, 32, 40),
+      ),
+      backgroundColor: context.scaffoldBackgroundColor,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          CarouselSlider(
+            items: pages,
+            carouselController: buttonCarouselController,
+            options: CarouselOptions(
+              height: MediaQuery.of(context).size.height * 0.72,
+              autoPlay: false,
+              enlargeCenterPage: true,
+              viewportFraction: 0.9,
+              aspectRatio: 2.0,
+              initialPage: currentPageIndex,
+              onPageChanged: (index, reason) {
+                setState(() {
+                  currentPageIndex = index;
+                });
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 218, 32, 40),
+                border: Border.all(
+                    color: Color.fromARGB(255, 218, 32, 40), width: 3),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              height: 60,
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Container(
+                    height: 45,
+                    width: 100,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: currentPageIndex == 0
+                            ? Colors.white
+                            : Color.fromARGB(255, 218, 32, 40),
+                        onPrimary: currentPageIndex == 0
+                            ? Colors.black87
+                            : Colors.white,
+                        textStyle: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: currentPageIndex == 0
+                                  ? Colors.white
+                                  : Color.fromARGB(255, 218, 32, 40),
+                              width: 3),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
-                    )),
-              ],
-            )));
+                      onPressed: () {
+                        buttonCarouselController.animateToPage(
+                          0,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.linear,
+                        );
+                      },
+                      child: Text('Invoice'),
+                    ),
+                  ),
+                  Container(
+                    height: 45,
+                    width: 100,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: currentPageIndex == 1
+                            ? Colors.white
+                            : Color.fromARGB(255, 218, 32, 40),
+                        onPrimary: currentPageIndex == 1
+                            ? Colors.black87
+                            : Colors.white,
+                        textStyle: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: currentPageIndex == 1
+                                  ? Colors.white
+                                  : Color.fromARGB(255, 218, 32, 40),
+                              width: 3),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onPressed: () {
+                        buttonCarouselController.animateToPage(
+                          1,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.linear,
+                        );
+                      },
+                      child: Text('Receipts'),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

@@ -210,6 +210,58 @@ class _DashState extends State<Dash> {
     }
   }
 
+  Future<void> upgradeRouterOs() async {
+    // Make an HTTP request to upgrade router OS
+    final response = await http.post(
+      Uri.parse(
+          'http://${widget.ipAddresses}/rest/system/package/update/install'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Dash(
+            ipAddresses: widget.ipAddresses,
+            ipUsername: widget.ipUsername,
+            ipPassword: widget.ipPassword,
+            username: widget.username,
+            password: widget.password,
+          ),
+        ),
+      );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Router Upgrade Succesfully'),
+            content: Text(
+              'Wait for Some Few Seconds',
+            ),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      print('Failed to send upgrade request');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+    // Add any additional logic or error handling here
+  }
+
   Future<void> rebootRouter() async {
     // Make an HTTP request to reboot router
     final response = await http.post(
@@ -225,7 +277,7 @@ class _DashState extends State<Dash> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Dashview(
+          builder: (context) => Dash(
             ipAddresses: widget.ipAddresses,
             ipUsername: widget.ipUsername,
             ipPassword: widget.ipPassword,
@@ -233,6 +285,25 @@ class _DashState extends State<Dash> {
             password: widget.password,
           ),
         ),
+      );
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Router Reboot Succesfully'),
+            content: Text(
+              'Wait for Some Few Seconds',
+            ),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
     } else {
       print('Failed to send reboot request');
@@ -371,9 +442,10 @@ class _DashState extends State<Dash> {
           PopupMenuItem(
             child: ListTile(
               leading: Icon(Icons.arrow_circle_up_rounded),
-              title: Text('$mode'),
+              title: Text('Upgrade'),
               onTap: () {
                 // Handle Option 2
+                upgradeRouterOs();
               },
             ),
           ),

@@ -10,9 +10,9 @@ class SupportM1 extends StatefulWidget {
 
 class _SupportM1State extends State<SupportM1> {
   static const menuItems = <String>[
-    'Trouble Ticketing',
-    'Service Ticketing',
-    'Personal Ticketing',
+    'Complaint Request',
+    'Service Request',
+    'Personal Request',
     'Others',
   ];
   final List<DropdownMenuItem<String>> _dropitems = menuItems

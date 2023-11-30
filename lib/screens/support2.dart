@@ -91,7 +91,7 @@ class _SupportMState extends State<SupportM> {
                   foregroundColor: Colors.black,
                   backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.black, width: 3),
+                    side: const BorderSide(color: Color.fromARGB(255, 123, 23, 23), width: 3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

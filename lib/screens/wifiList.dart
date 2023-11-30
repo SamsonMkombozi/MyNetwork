@@ -35,6 +35,55 @@ class _WiFiListPageState extends State<WiFiListPage> {
     super.dispose();
   }
 
+  Future<void> deleteWifi() async {
+    final response = await http.delete(
+        Uri.parse('http://${widget.ipAddresses}/rest/interface/wireless/two'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+        });
+
+    final response2 = await http.delete(
+      Uri.parse(
+          'http://${widget.ipAddresses}/rest/interface/wireless/security-profiles/two'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+      },
+    );
+
+    if (response.statusCode == 204 && response2.statusCode == 204) {
+      print('Delete Wi-Fi Complete');
+    } else {
+      print('${response.statusCode}' + '${response.reasonPhrase}');
+      print('${response2.statusCode}' + '${response2.reasonPhrase}');
+      print('Failed To Delete Wi-Fi');
+    }
+  }
+
+  // Future<void> deleteSecurity() async {
+  //   final response2 = await http.delete(
+  //     Uri.parse(
+  //         'http://${widget.ipAddresses}/rest/interface/wireless/security-profiles/two'),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization':
+  //           'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+  //     },
+  //   );
+
+  //   if (response2.statusCode == 204) {
+  //     print('Delete Security-Profile Complete');
+  //     print(response2);
+  //   } else {
+  //     print(response2.statusCode);
+  //     print(response2.reasonPhrase);
+  //     print('Failed To Security-Profile Delete');
+  //   }
+  // }
+
   Future<void> fetchWiFiNetworks() async {
     final response = await http.get(
         Uri.parse('http://${widget.ipAddresses}/rest/interface/wireless'),
@@ -87,7 +136,7 @@ class _WiFiListPageState extends State<WiFiListPage> {
     );
     return securityProfile != null
         ? securityProfile['wpa2-pre-shared-key']
-        : "No Security Profile";
+        : "Test1234";
   }
 
   Future<void> showAddNetworkDialog(BuildContext context) async {
@@ -324,7 +373,8 @@ class _WiFiNetworkCardState extends State<WiFiNetworkCard> {
           trailing: IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () {
-              deleteWirelessNetworkAndSecurityProfile();
+              // deleteWirelessNetworkAndSecurityProfile(widget.network.name);
+              deleteWifi(widget.network.name);
             },
           ),
         ),
@@ -375,43 +425,32 @@ class _WiFiNetworkCardState extends State<WiFiNetworkCard> {
     }
   }
 
-  Future<void> deleteWirelessNetworkAndSecurityProfile() async {
-    // Delete the wireless network profile.
-    final wirelessNetworkRemoveResponse = await http.post(
-      Uri.parse('http://${widget.ipAddresses}/interface/wireless/remove'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':
-            'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
-      },
-      body: json.encode({'numbers': widget.index}),
-    );
+  Future<void> deleteWifi(String networkName) async {
+    final response = await http.delete(
+        Uri.parse(
+            'http://${widget.ipAddresses}/rest/interface/wireless/$networkName'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
+        });
 
-    // Check the response status code.
-    if (wirelessNetworkRemoveResponse.statusCode != 200) {
-      throw Exception(
-          'Failed to delete wireless network profile: ${wirelessNetworkRemoveResponse.statusCode}');
-    }
-
-    // Delete the security profile.
-    final securityProfileRemoveResponse = await http.post(
+    final response2 = await http.delete(
       Uri.parse(
-          'http://${widget.ipAddresses}/interface/wireless/security-profiles/remove'),
+          'http://${widget.ipAddresses}/rest/interface/wireless/security-profiles/$networkName'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
             'Basic ${base64Encode(utf8.encode('${widget.ipUsername}:${widget.ipPassword}'))}',
       },
-      body: json.encode({'numbers': widget.index}),
     );
 
-    // Check the response status code.
-    if (securityProfileRemoveResponse.statusCode != 200) {
-      throw Exception(
-          'Failed to delete security profile: ${securityProfileRemoveResponse.statusCode}');
+    if (response.statusCode == 204 && response2.statusCode == 204) {
+      print('Delete Wi-Fi Complete');
+    } else {
+      print('${response.statusCode}' + '${response.reasonPhrase}');
+      print('${response2.statusCode}' + '${response2.reasonPhrase}');
+      print('Failed To Delete Wi-Fi');
     }
-
-    // Both network and security profiles have been deleted successfully.
-    return;
   }
 }
