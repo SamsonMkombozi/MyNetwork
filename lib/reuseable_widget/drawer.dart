@@ -70,37 +70,40 @@ class _drawpState extends State<drawp> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
-                              padding: EdgeInsets.all(16),
+                              padding: EdgeInsets.all(0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(width: 2),
-                                      color: Colors
-                                          .white, // Set the background color of the container
-                                      shape: BoxShape
-                                          .circle, // Make the container circular
-                                    ),
-                                    width: 90,
-                                    height: 90,
-                                    child: Center(
-                                      child: Text(
-                                        widget.username.isNotEmpty
-                                            ? widget.username[0]
-                                            : '',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 40,
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 12),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(width: 2),
+                                        color: Colors
+                                            .white, // Set the background color of the container
+                                        shape: BoxShape
+                                            .circle, // Make the container circular
+                                      ),
+                                      width: 90,
+                                      height: 90,
+                                      child: Center(
+                                        child: Text(
+                                          widget.username.isNotEmpty
+                                              ? widget.username[0]
+                                              : '',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 40,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                   Padding(
                                     padding:
-                                        EdgeInsets.only(bottom: 50, right: 10),
+                                        EdgeInsets.only(bottom: 50, right: 7),
                                     child: IconButton(
                                       onPressed: () {
                                         // Handle back button press here
@@ -127,9 +130,6 @@ class _drawpState extends State<drawp> {
                                     color: Colors.white),
                               ),
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
                             Align(
                               alignment: Alignment.center,
                               child: Text(
@@ -141,7 +141,7 @@ class _drawpState extends State<drawp> {
                               ),
                             ),
                             SizedBox(
-                              height: 15,
+                              height: 6,
                             )
                           ]),
                     ),
@@ -206,7 +206,7 @@ class _drawpState extends State<drawp> {
                     ),
                     title: Align(
                       child: Text(
-                        "Invoice",
+                        "Payment",
                         style: TextStyle(
                             fontSize: 20,
                             color: Colors.black,
@@ -454,7 +454,10 @@ class _drawpState extends State<drawp> {
                                   false, // Remove all previous routes from the stack
                             );
                           },
-                          child: Text('LOGOUT'),
+                          child: Text(
+                            'LOGOUT',
+                            style: TextStyle(color: Colors.white),
+                          ),
                           shape: ContinuousRectangleBorder(),
                         ),
                       )

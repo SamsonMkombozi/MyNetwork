@@ -89,9 +89,12 @@ class _RouterConnectionPageState extends State<RouterConnectionPage> {
               ),
             ),
           );
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Response: ${response.body}'),
-          ));
+          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          //   content: Text('Response: ${response.body}'),
+          // ));
+          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          //   content: Text('loading'),
+          // ));
         }
       } else {
         print(

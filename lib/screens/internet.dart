@@ -37,6 +37,7 @@ class InternetPage extends StatelessWidget {
                   // Handle back button press here
                   Navigator.of(context).pop();
                 },
+                color: Colors.white,
                 icon: Icon(Icons.arrow_back),
               ),
             )),

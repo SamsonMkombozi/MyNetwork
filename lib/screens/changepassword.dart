@@ -22,7 +22,6 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
   TextEditingController newPasswordController = TextEditingController();
 
   Future<void> changePassword() async {
-    
     String credentials = '${widget.username}:${widget.password}';
     String encodedCredentials = base64Encode(utf8.encode(credentials));
 
@@ -61,7 +60,10 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Change Password'),
+        title: Text(
+          'Change Password',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+        ),
         toolbarHeight: 130,
         backgroundColor: Color.fromARGB(255, 218, 32, 40),
         centerTitle: true,
@@ -74,6 +76,7 @@ class _PasswordChangePageState extends State<PasswordChangePage> {
                 // Handle back button press here
                 Navigator.of(context).pop();
               },
+              color: Colors.white,
               icon: Icon(Icons.arrow_back),
             ),
           ),

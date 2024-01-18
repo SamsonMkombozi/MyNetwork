@@ -335,93 +335,123 @@ class _DashState extends State<Dash> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 110,
-          backgroundColor: const Color.fromARGB(255, 218, 32, 40),
-          leadingWidth: 100,
-          leading: Padding(
-            padding: EdgeInsets.only(left: 0),
-            child: GestureDetector(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 2),
-                        color: Colors
-                            .white, // Set the background color of the container
-                        shape: BoxShape.circle, // Make the container circular
-                      ),
-                      width: 70,
-                      height: 70,
-                      child: Center(
-                        child: Text(
-                          widget.username.isNotEmpty ? widget.username[0] : '',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 40,
+          appBar: AppBar(
+            toolbarHeight: 110,
+            backgroundColor: const Color.fromARGB(255, 218, 32, 40),
+            leadingWidth: 100,
+            leading: Padding(
+              padding: EdgeInsets.only(left: 0),
+              child: GestureDetector(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 2),
+                          color: Colors
+                              .white, // Set the background color of the container
+                          shape: BoxShape.circle, // Make the container circular
+                        ),
+                        width: 70,
+                        height: 70,
+                        child: Center(
+                          child: Text(
+                            widget.username.isNotEmpty
+                                ? widget.username[0]
+                                : '',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 40,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ]),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => drawp(
-                            ipAddresses: widget.ipAddresses,
-                            ipUsername: widget.ipUsername,
-                            ipPassword: widget.ipPassword,
-                            username: widget.username,
-                            password: widget.password,
-                          )),
-                );
-              },
-            ),
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 35),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.menu_open_rounded,
-                  color: Colors.white,
-                  size: 60,
-                ),
-                onPressed: () {
-                  showPopupMenu(context);
+                    ]),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => drawp(
+                              ipAddresses: widget.ipAddresses,
+                              ipUsername: widget.ipUsername,
+                              ipPassword: widget.ipPassword,
+                              username: widget.username,
+                              password: widget.password,
+                            )),
+                  );
                 },
               ),
-            )
-          ],
-        ),
-        body: screens[_currentIndex],
-        bottomNavigationBar: Container(
-          // Adjust the height as needed
-          child: FloatingNavbar(
-            currentIndex: _currentIndex,
-            backgroundColor: const Color.fromARGB(255, 218, 32, 40),
-            items: [
-              FloatingNavbarItem(
-                icon: Icons.home,
-                title: 'Home',
-              ),
-              FloatingNavbarItem(
-                icon: Icons.network_wifi_3_bar,
-                title: 'Network',
-              ),
+            ),
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 6),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.menu_open_rounded,
+                    color: Colors.white,
+                    size: 60,
+                  ),
+                  onPressed: () {
+                    // showPopupMenu(context);
+                    showMenu(
+                        context: context,
+                        position: RelativeRect.fill,
+                        items: <PopupMenuEntry>[
+                          PopupMenuItem(
+                            child: ListTile(
+                              leading: Icon(Icons.replay_30_sharp),
+                              title: Text('Reboot'),
+                              onTap: () {
+                                rebootRouter();
+                              },
+                            ),
+                          ),
+                          PopupMenuItem(
+                            child: ListTile(
+                              leading: Icon(Icons.arrow_circle_up_rounded),
+                              title: Text('Upgrade'),
+                              onTap: () {
+                                // Handle Option 2
+                                upgradeRouterOs();
+                              },
+                            ),
+                          ),
+                        ]);
+                  },
+                ),
+              )
             ],
-            iconSize: 30,
-            onTap: ((int index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            }),
           ),
-        ),
-      ),
+          body: screens[_currentIndex],
+          bottomNavigationBar: Container(
+            height: MediaQuery.of(context).size.height * 0.09,
+            child: BottomNavigationBar(
+              selectedLabelStyle:
+                  TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+              unselectedLabelStyle:
+                  TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+              selectedItemColor: Colors.white,
+              currentIndex: _currentIndex,
+              backgroundColor: const Color.fromARGB(255, 218, 32, 40),
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.network_wifi_3_bar),
+                  label: 'Network',
+                ),
+              ],
+              iconSize: 30,
+              onTap: ((int index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              }),
+            ),
+          )),
     );
   }
 

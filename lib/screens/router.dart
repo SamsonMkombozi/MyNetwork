@@ -238,6 +238,7 @@ class _RouterPageState extends State<RouterPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              color: Colors.white,
               icon: Icon(Icons.arrow_back),
             ),
           ),
@@ -397,34 +398,37 @@ class _RouterPageState extends State<RouterPage> {
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
-                                    TextButton(
-                                      child: const Text(
-                                        'Yes',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        TextButton(
+                                          child: const Text(
+                                            'Yes',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            upgradeRouterOs();
+                                            Navigator.of(context).pop();
+                                          },
                                         ),
-                                      ),
-                                      onPressed: () {
-                                        upgradeRouterOs();
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                    SizedBox(
-                                      width: 140,
-                                    ),
-                                    TextButton(
-                                      child: const Text(
-                                        'No',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400,
+                                        TextButton(
+                                          child: const Text(
+                                            'No',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
                                         ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
+                                      ],
+                                    )
                                   ],
                                 );
                               },
@@ -439,7 +443,7 @@ class _RouterPageState extends State<RouterPage> {
                             ),
                           ),
                           child: Text(
-                            'Upgrade',
+                            'Update',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -477,34 +481,37 @@ class _RouterPageState extends State<RouterPage> {
                                     textAlign: TextAlign.center,
                                   ),
                                   actions: [
-                                    TextButton(
-                                      child: const Text(
-                                        'Yes',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        TextButton(
+                                          child: const Text(
+                                            'Yes',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            rebootRouter();
+                                            Navigator.pop(context);
+                                          },
                                         ),
-                                      ),
-                                      onPressed: () {
-                                        rebootRouter();
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                    SizedBox(
-                                      width: 140,
-                                    ),
-                                    TextButton(
-                                      child: const Text(
-                                        'No',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400,
+                                        TextButton(
+                                          child: const Text(
+                                            'No',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
                                         ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
+                                      ],
+                                    )
                                   ],
                                 );
                               },

@@ -150,6 +150,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              color: Colors.white,
               icon: Icon(Icons.arrow_back),
             ),
           ),
@@ -165,6 +166,7 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                 padding: EdgeInsets.only(left: 13),
                 child: PopupMenuButton<String>(
                   color: Colors.white,
+                  iconColor: Colors.white,
                   onSelected: (String value) {
                     if (value == 'Enable') {
                       setState(() {
@@ -331,7 +333,12 @@ class _MyWifiWidgetState extends State<MyWifiWidget> {
                       ),
                     ),
                     onPressed: saveWifiDetails,
-                    child: Text('SAVE'),
+                    child: Text(
+                      'SAVE',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                   SizedBox(
                     height: 15,

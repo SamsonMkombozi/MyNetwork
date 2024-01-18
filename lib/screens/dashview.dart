@@ -281,7 +281,7 @@ class _DashviewState extends State<Dashview> {
           side: const BorderSide(color: Colors.black, width: 3),
           borderRadius: BorderRadius.circular(10),
         ),
-        margin: const EdgeInsets.all(9.0),
+        margin: const EdgeInsets.all(5.0),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
@@ -307,7 +307,10 @@ class _DashviewState extends State<Dashview> {
                       FloatingActionButton(
                         backgroundColor: Colors.black,
                         onPressed: _previousItem,
-                        child: Icon(Icons.arrow_back),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
                       ),
                       SizedBox(width: 10),
                       NetworkItem(
@@ -321,7 +324,10 @@ class _DashviewState extends State<Dashview> {
                       FloatingActionButton(
                         backgroundColor: Colors.black,
                         onPressed: _nextItem,
-                        child: Icon(Icons.arrow_forward),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   );
@@ -358,10 +364,10 @@ class _DashviewState extends State<Dashview> {
                 height: 9,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    'Weekly Data Usage (GB)',
+                    'Data Usage (GB)',
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,

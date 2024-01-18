@@ -84,6 +84,7 @@ class _ConnectedEtherDevicesPageState extends State<ConnectedEtherDevicesPage> {
                   // Handle back button press here
                   Navigator.of(context).pop();
                 },
+                color: Colors.white,
                 icon: Icon(Icons.arrow_back),
               ),
             )),

@@ -80,6 +80,7 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
                   // Handle back button press here
                   Navigator.of(context).pop();
                 },
+                color: Colors.white,
                 icon: Icon(Icons.arrow_back),
               ),
             )),
@@ -209,7 +210,12 @@ class _SpeedTestPageState extends State<SpeedTestPage> {
                             loading = false;
                           });
                         },
-                  child: const Text('Start'),
+                  child: const Text(
+                    'Start',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     primary:
                         readyToTest && !loading ? Colors.black : Colors.white,

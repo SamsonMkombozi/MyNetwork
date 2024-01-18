@@ -102,7 +102,7 @@ class _NetworkState extends State<Network> {
                       ),
                       actions: [
                         Row(
-                          mainAxisSize: MainAxisSize.max,
+                          // smainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             TextButton(
@@ -142,18 +142,21 @@ class _NetworkState extends State<Network> {
                                 );
                               },
                             ),
-                            TextButton(
-                              child: const Text(
-                                'Cancel',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
                           ],
                         ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: TextButton(
+                            child: const Text(
+                              'Back',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w400),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        )
                       ],
                     );
                   },

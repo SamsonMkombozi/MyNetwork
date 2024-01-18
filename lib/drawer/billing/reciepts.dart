@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class Reciept extends StatefulWidget {
   const Reciept({super.key});
@@ -76,7 +78,7 @@ class _RecieptState extends State<Reciept> {
                             Align(
                                 alignment: Alignment.bottomCenter,
                                 child: Padding(
-                                  padding: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(3),
                                   child: Text(
                                     '120 USD',
                                     style: TextStyle(
@@ -115,6 +117,7 @@ class rView extends StatefulWidget {
 }
 
 class _rViewState extends State<rView> {
+  final pdf = pw.Document();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,7 +239,7 @@ class _rViewState extends State<rView> {
                               ),
                             ),
                             SizedBox(
-                              height: 20,
+                              height: 10,
                             ),
                             Text(
                               'Date',
@@ -255,7 +258,7 @@ class _rViewState extends State<rView> {
                               ),
                             ),
                             SizedBox(
-                              height: 20,
+                              height: 3,
                             ),
                             Text(
                               'Account No.',
@@ -384,8 +387,19 @@ class _rViewState extends State<rView> {
                                   child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.black),
-                                      onPressed: () {},
-                                      child: Text('Print'))),
+                                      onPressed: () {
+                                        pdf.addPage(pw.Page(
+                                            pageFormat: PdfPageFormat.a4,
+                                            build: (pw.Context context) {
+                                              return pw.Center(
+                                                child: pw.Text("Hello World"),
+                                              ); // Center
+                                            })); // Page
+                                      },
+                                      child: Text(
+                                        'Print',
+                                        style: TextStyle(color: Colors.white),
+                                      ))),
                             ),
                           ],
                         ),

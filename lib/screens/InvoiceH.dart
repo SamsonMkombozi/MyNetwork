@@ -27,10 +27,18 @@ class DemoChoosePlanScreen3State extends State<DemoChoosePlanScreen3> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('BALANCE'),
-            Text('-105 USD-'),
+            Text(
+              'BALANCE',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+            ),
+            Text(
+              '-105 USD-',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+            ),
           ],
-        ), 
+        ),
         centerTitle: true,
         leading: Transform.scale(
           scale: 2.5,
@@ -40,6 +48,7 @@ class DemoChoosePlanScreen3State extends State<DemoChoosePlanScreen3> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              color: Colors.white,
               icon: Icon(Icons.arrow_back),
             ),
           ),
@@ -85,7 +94,7 @@ class DemoChoosePlanScreen3State extends State<DemoChoosePlanScreen3> {
                 children: [
                   Container(
                     height: 45,
-                    width: 100,
+                    width: 105,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         primary: currentPageIndex == 0
@@ -119,7 +128,7 @@ class DemoChoosePlanScreen3State extends State<DemoChoosePlanScreen3> {
                   ),
                   Container(
                     height: 45,
-                    width: 100,
+                    width: 115,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         primary: currentPageIndex == 1

@@ -47,7 +47,10 @@ class _SupportM1State extends State<SupportM1> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Make Request'),
+        title: Text(
+          'Make Request',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+        ),
         centerTitle: true,
         leading: Transform.scale(
             scale:
@@ -59,6 +62,7 @@ class _SupportM1State extends State<SupportM1> {
                   // Handle back button press here
                   Navigator.of(context).pop();
                 },
+                color: Colors.white,
                 icon: Icon(Icons.arrow_back),
               ),
             )),
@@ -115,7 +119,11 @@ class _SupportM1State extends State<SupportM1> {
                   minimumSize: Size.fromHeight(50),
                   textStyle: TextStyle(fontSize: 20),
                 ),
-                child: Text('SEND'),
+                child: Text(
+                  'SEND',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w900),
+                ),
                 onPressed: () {
                   _key.currentState!.save();
                   print('${email.text}');
